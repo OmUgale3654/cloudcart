@@ -254,8 +254,26 @@ import { Order } from '../../core/models/order.model';
     .total-price { color: var(--primary); font-size: 1.35rem; }
 
     @media (max-width: 900px) {
-      .order-details-grid { grid-template-columns: 1fr; }
-      .timeline-container { overflow-x: auto; padding-bottom: 10px; }
+      .order-details-grid { grid-template-columns: 1fr; gap: 20px; }
+      .timeline-container { overflow-x: auto; padding-bottom: 12px; }
+    }
+
+    @media (max-width: 600px) {
+      .p-6 { padding: 1rem; }
+      .status-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .status-right {
+        align-items: flex-start;
+        width: 100%;
+      }
+      .order-title { font-size: 1.35rem; }
+      .timeline-container {
+        min-width: 420px;
+      }
+      .total-price { font-size: 1.2rem; }
     }
   `]
 })

@@ -298,8 +298,17 @@ import { Cart } from '../../core/models/cart.model';
     .calc-row.total .price { color: var(--primary); font-size: 1.35rem; }
 
     @media (max-width: 900px) {
-      .checkout-layout { grid-template-columns: 1fr; }
+      .checkout-layout { grid-template-columns: 1fr; gap: 24px; }
       .form-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .card.p-8 { padding: 1.25rem; }
+      .card.p-6 { padding: 1rem; }
+      .scenario-card { padding: 12px; }
+      .scenario-title { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .submit-order-btn { height: 48px; font-size: 0.95rem; }
+      .calc-row.total .price { font-size: 1.2rem; }
     }
   `]
 })

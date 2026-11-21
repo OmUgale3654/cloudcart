@@ -226,7 +226,36 @@ import { Cart } from '../../core/models/cart.model';
     .empty-cart-card p { color: var(--text-secondary); margin-top: 6px; }
 
     @media (max-width: 900px) {
-      .cart-layout { grid-template-columns: 1fr; }
+      .cart-layout { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .items-list { padding: 0 14px; }
+      .cart-item-row {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 0;
+      }
+      .item-img {
+        width: 64px;
+        height: 64px;
+      }
+      .item-details {
+        flex: 1;
+        min-width: 140px;
+      }
+      .item-quantity {
+        margin-left: 76px;
+      }
+      .item-subtotal {
+        margin-left: auto;
+      }
+      .p-6 {
+        padding: 1rem;
+      }
+      .total-amount {
+        font-size: 1.25rem;
+      }
     }
   `]
 })

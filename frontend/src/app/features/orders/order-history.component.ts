@@ -111,6 +111,22 @@ import { Order } from '../../core/models/order.model';
     @media (max-width: 768px) {
       .order-card-body { flex-direction: column; align-items: stretch; }
       .order-actions { margin-top: 12px; }
+      .order-actions .btn { width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 560px) {
+      .p-6 { padding: 1rem; }
+      .page-title { font-size: 1.45rem; }
+      .order-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .order-badge-row {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .order-total { font-size: 1.15rem; }
     }
   `]
 })

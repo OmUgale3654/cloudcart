@@ -219,8 +219,19 @@ import { Product } from '../../../core/models/product.model';
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 900px) {
-      .product-detail-card { grid-template-columns: 1fr; }
+      .product-detail-card { grid-template-columns: 1fr; gap: 28px; padding: 24px; }
       .purchase-box { flex-direction: column; align-items: stretch; }
+      .detail-gallery { min-height: 320px; }
+    }
+
+    @media (max-width: 600px) {
+      .product-detail-card { padding: 16px; gap: 20px; border-radius: var(--radius-md); }
+      .detail-gallery { min-height: 240px; max-height: 300px; }
+      .detail-title { font-size: 1.4rem; }
+      .detail-price { font-size: 1.6rem; margin-bottom: 14px; }
+      .qty-controls button { width: 44px; height: 44px; }
+      .qty-controls input { width: 50px; height: 44px; font-size: 1rem; }
+      .add-cart-btn { width: 100%; height: 48px; }
     }
   `]
 })

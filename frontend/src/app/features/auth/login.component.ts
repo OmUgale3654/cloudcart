@@ -75,6 +75,11 @@ import { NotificationService } from '../../core/services/notification.service';
       background: #ffffff;
     }
     .p-8 { padding: 2rem; }
+    @media (max-width: 480px) {
+      .auth-page { padding: 24px 12px; }
+      .p-8 { padding: 1.5rem 1.25rem; }
+      .pills-row { flex-direction: column; gap: 6px; }
+    }
     .brand-icon {
       width: 44px;
       height: 44px;

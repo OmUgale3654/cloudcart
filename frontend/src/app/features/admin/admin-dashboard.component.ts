@@ -286,6 +286,9 @@ import { ApiResponse } from '../../core/models/api.model';
       gap: 10px;
       border-bottom: 2px solid var(--border-color);
       padding-bottom: 2px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
     }
     .tab-btn {
       background: none;
@@ -371,7 +374,23 @@ import { ApiResponse } from '../../core/models/api.model';
     .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
     @media (max-width: 992px) {
-      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .admin-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .header-actions { width: 100%; }
+      .header-actions .btn { width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      .page-title { font-size: 1.45rem; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .card.p-6 { padding: 1.25rem 1rem; }
+      .modal-content {
+        margin: 12px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .card-header-line { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .card-header-line .btn { width: 100%; text-align: center; }
     }
   `]
 })

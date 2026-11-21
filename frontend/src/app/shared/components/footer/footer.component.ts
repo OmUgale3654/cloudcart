@@ -171,8 +171,15 @@ import { RouterModule } from '@angular/router';
       gap: 10px;
     }
     @media (max-width: 900px) {
-      .footer-content { grid-template-columns: 1fr; gap: 30px; }
+      .footer-wrapper { margin-top: 48px; }
+      .footer-content { grid-template-columns: repeat(2, 1fr); gap: 30px; padding: 40px 1.25rem 30px; }
+      .brand-col { grid-column: span 2; }
       .bottom-inner { flex-direction: column; gap: 10px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .footer-content { grid-template-columns: 1fr; gap: 24px; }
+      .brand-col { grid-column: span 1; }
+      .tech-tags { gap: 4px; }
     }
   `]
 })

@@ -116,6 +116,11 @@ import { NotificationService } from '../../core/services/notification.service';
     .auth-footer { font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid #f1f5f9; padding-top: 16px; }
     .w-full { width: 100%; }
     .font-bold { font-weight: 700; }
+    @media (max-width: 540px) {
+      .auth-page { padding: 24px 12px; }
+      .p-8 { padding: 1.5rem 1.25rem; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; gap: 10px; }
+    }
   `]
 })
 export class RegisterComponent {

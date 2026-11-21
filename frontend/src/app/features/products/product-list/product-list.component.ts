@@ -12,9 +12,17 @@ import { Category, Product } from '../../../core/models/product.model';
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="container py-8">
+      <!-- Mobile Filter Toggle Bar -->
+      <div class="mobile-filter-bar">
+        <button (click)="toggleMobileFilters()" class="btn btn-outline w-full filter-toggle-btn">
+          <span>⚙️ {{ mobileFiltersOpen ? 'Hide Filters' : 'Filter & Search Products' }}</span>
+          <span *ngIf="selectedCategoryId || keyword" class="badge badge-primary">Filters Active</span>
+        </button>
+      </div>
+
       <div class="catalog-layout">
         <!-- Sidebar Filters -->
-        <aside class="filter-sidebar">
+        <aside class="filter-sidebar" [class.open]="mobileFiltersOpen">
           <div class="card p-5 filter-box">
             <div class="filter-header">
               <h3>Filters</h3>
@@ -293,9 +301,35 @@ import { Category, Product } from '../../../core/models/product.model';
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .mobile-filter-bar { display: none; margin-bottom: 16px; }
+    .filter-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      font-weight: 700;
+    }
+
     @media (max-width: 900px) {
-      .catalog-layout { grid-template-columns: 1fr; }
-      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .catalog-layout { grid-template-columns: 1fr; gap: 20px; }
+      .mobile-filter-bar { display: block; }
+      .filter-sidebar {
+        display: none;
+      }
+      .filter-sidebar.open {
+        display: block;
+        animation: fadeIn 0.2s ease-out;
+      }
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .catalog-toolbar { flex-wrap: wrap; gap: 12px; }
+    }
+
+    @media (max-width: 540px) {
+      .product-grid { grid-template-columns: 1fr; gap: 16px; }
+      .product-img-wrapper { height: 180px; }
+      .catalog-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .sort-select-wrapper { width: 100%; justify-content: space-between; }
+      .sort-select { flex: 1; max-width: 200px; }
     }
   `]
 })
@@ -308,6 +342,7 @@ export class ProductListComponent implements OnInit {
   categories: Category[] = [];
   products: Product[] = [];
   loading = false;
+  mobileFiltersOpen = false;
 
   selectedCategoryId: number | null = null;
   keyword = '';
@@ -358,9 +393,14 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+  toggleMobileFilters() {
+    this.mobileFiltersOpen = !this.mobileFiltersOpen;
+  }
+
   applyFilters() {
     this.currentPage = 0;
     this.loadProducts();
+    this.mobileFiltersOpen = false;
   }
 
   resetFilters() {

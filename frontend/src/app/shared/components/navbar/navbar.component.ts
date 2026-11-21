@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 
@@ -16,12 +17,13 @@ import { CartService } from '../../../core/services/cart.service';
       </div>
 
       <nav class="navbar container">
-        <a routerLink="/" class="brand">
+        <a routerLink="/" class="brand" (click)="closeMobileMenu()">
           <div class="brand-icon">CC</div>
           <span class="brand-name">Cloud<span>Cart</span></span>
         </a>
 
-        <div class="search-box">
+        <!-- Desktop Search Box -->
+        <div class="search-box desktop-only">
           <input
             type="text"
             placeholder="Search products by title, SKU, or keyword..."
@@ -31,7 +33,8 @@ import { CartService } from '../../../core/services/cart.service';
           <button (click)="onSearch()" aria-label="Search">🔍</button>
         </div>
 
-        <div class="nav-actions">
+        <!-- Desktop Navigation Actions -->
+        <div class="nav-actions desktop-only">
           <a routerLink="/products" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Catalog</a>
 
           <a *ngIf="authService.isAdmin()" routerLink="/admin" class="admin-pill" routerLinkActive="active">
@@ -61,7 +64,65 @@ import { CartService } from '../../../core/services/cart.service';
             </div>
           </ng-template>
         </div>
+
+        <!-- Mobile Header Quick Actions (Cart + Hamburger Toggle) -->
+        <div class="mobile-header-actions mobile-only">
+          <a routerLink="/cart" class="mobile-cart-icon" (click)="closeMobileMenu()">
+            🛒
+            <span class="cart-badge" *ngIf="(cartService.cartCount$ | async) as count">{{ count }}</span>
+          </a>
+
+          <button
+            class="hamburger-btn"
+            (click)="toggleMobileMenu()"
+            [attr.aria-expanded]="isMobileMenuOpen"
+            aria-label="Toggle Navigation Menu"
+          >
+            <span class="hamburger-bar" [class.open]="isMobileMenuOpen"></span>
+            <span class="hamburger-bar" [class.open]="isMobileMenuOpen"></span>
+            <span class="hamburger-bar" [class.open]="isMobileMenuOpen"></span>
+          </button>
+        </div>
       </nav>
+
+      <!-- Mobile Navigation Drawer -->
+      <div class="mobile-menu-drawer mobile-only" [class.open]="isMobileMenuOpen">
+        <div class="mobile-search-box">
+          <input
+            type="text"
+            placeholder="Search products..."
+            [(ngModel)]="searchKeyword"
+            (keyup.enter)="onSearch()"
+          />
+          <button (click)="onSearch()" aria-label="Search">🔍</button>
+        </div>
+
+        <div class="mobile-nav-links">
+          <a routerLink="/products" class="mobile-nav-link" routerLinkActive="active" (click)="closeMobileMenu()">
+            🛍️ All Products Catalog
+          </a>
+
+          <a *ngIf="authService.isAdmin()" routerLink="/admin" class="mobile-nav-link admin" routerLinkActive="active" (click)="closeMobileMenu()">
+            🛡️ Admin Portal
+          </a>
+
+          <ng-container *ngIf="authService.currentUser$ | async as user; else mobileGuestNav">
+            <a routerLink="/orders" class="mobile-nav-link" routerLinkActive="active" (click)="closeMobileMenu()">
+              📦 My Orders & Tracking ({{ user.firstName }})
+            </a>
+            <div class="mobile-auth-footer">
+              <button (click)="logout(); closeMobileMenu()" class="btn btn-outline btn-sm w-full">Sign Out</button>
+            </div>
+          </ng-container>
+
+          <ng-template #mobileGuestNav>
+            <div class="mobile-guest-buttons">
+              <a routerLink="/auth/login" class="btn btn-outline w-full text-center" (click)="closeMobileMenu()">Sign In</a>
+              <a routerLink="/auth/register" class="btn btn-primary w-full text-center" (click)="closeMobileMenu()">Register</a>
+            </div>
+          </ng-template>
+        </div>
+      </div>
     </header>
   `,
   styles: [`
@@ -76,9 +137,10 @@ import { CartService } from '../../../core/services/cart.service';
     .top-announcement {
       background: #0f172a;
       color: #94a3b8;
-      font-size: 0.75rem;
+      font-size: 0.725rem;
       text-align: center;
       padding: 6px 12px;
+      line-height: 1.4;
     }
     .top-announcement strong { color: #38bdf8; }
     .navbar {
@@ -86,7 +148,7 @@ import { CartService } from '../../../core/services/cart.service';
       align-items: center;
       justify-content: space-between;
       height: 70px;
-      gap: 24px;
+      gap: 20px;
     }
     .brand {
       display: flex;
@@ -108,7 +170,7 @@ import { CartService } from '../../../core/services/cart.service';
       box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
     }
     .brand-name {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: var(--secondary);
       letter-spacing: -0.03em;
@@ -116,7 +178,7 @@ import { CartService } from '../../../core/services/cart.service';
     .brand-name span { color: var(--primary); }
     .search-box {
       flex: 1;
-      max-width: 520px;
+      max-width: 480px;
       display: flex;
       align-items: center;
       background: #f1f5f9;
@@ -154,7 +216,7 @@ import { CartService } from '../../../core/services/cart.service';
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
     .nav-link {
       font-size: 0.9rem;
@@ -246,6 +308,145 @@ import { CartService } from '../../../core/services/cart.service';
       align-items: center;
       gap: 8px;
     }
+
+    /* Mobile Header Controls */
+    .mobile-header-actions {
+      display: none;
+      align-items: center;
+      gap: 14px;
+    }
+    .mobile-cart-icon {
+      position: relative;
+      font-size: 1.4rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+    }
+    .mobile-cart-icon .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      font-size: 0.65rem;
+      min-width: 18px;
+      height: 18px;
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .hamburger-bar {
+      width: 100%;
+      height: 2.5px;
+      background-color: var(--secondary);
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+    .hamburger-bar.open:nth-child(1) {
+      transform: translateY(7.5px) rotate(45deg);
+    }
+    .hamburger-bar.open:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger-bar.open:nth-child(3) {
+      transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    /* Mobile Drawer */
+    .mobile-menu-drawer {
+      display: none;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 16px 20px 24px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      animation: fadeIn 0.2s ease-out;
+    }
+    .mobile-menu-drawer.open {
+      display: block;
+    }
+    .mobile-search-box {
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 4px 8px 4px 12px;
+      margin-bottom: 16px;
+    }
+    .mobile-search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.9rem;
+      padding: 6px 0;
+    }
+    .mobile-search-box button {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .mobile-nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mobile-nav-link {
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background 0.15s ease;
+    }
+    .mobile-nav-link:hover, .mobile-nav-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .mobile-nav-link.admin {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    .mobile-guest-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .mobile-auth-footer {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .w-full { width: 100%; }
+    .text-center { text-align: center; }
+
+    /* Responsive Breakpoints */
+    .mobile-only { display: none; }
+    .desktop-only { display: flex; }
+
+    @media (max-width: 900px) {
+      .desktop-only { display: none !important; }
+      .mobile-only { display: flex; }
+      .mobile-menu-drawer.open { display: block; }
+      .navbar { height: 60px; }
+      .brand-icon { width: 34px; height: 34px; font-size: 1rem; }
+      .brand-name { font-size: 1.2rem; }
+    }
   `]
 })
 export class NavbarComponent implements OnInit {
@@ -254,18 +455,36 @@ export class NavbarComponent implements OnInit {
   private router = inject(Router);
 
   searchKeyword = '';
+  isMobileMenuOpen = false;
 
   ngOnInit() {
     if (this.authService.isAuthenticated()) {
       this.cartService.loadCart().subscribe({ error: () => {} });
     }
+
+    // Auto-close mobile menu on any navigation
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.closeMobileMenu();
+    });
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 
   onSearch() {
     if (this.searchKeyword.trim()) {
       this.router.navigate(['/products'], { queryParams: { keyword: this.searchKeyword.trim() } });
+      this.closeMobileMenu();
     } else {
       this.router.navigate(['/products']);
+      this.closeMobileMenu();
     }
   }
 
