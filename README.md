@@ -23,13 +23,14 @@
    - [Database-Per-Service Pattern](#database-per-service-pattern)
    - [Security & PCI-DSS Compliance](#security--pci-dss-compliance)
 4. [Technology Stack](#technology-stack)
-5. [Quickstart: Local Docker Compose](#quickstart-local-docker-compose)
-6. [Local Development Setup](#local-development-setup)
-7. [Kubernetes Deployment (Minikube / Cloud)](#kubernetes-deployment-minikube--cloud)
-8. [CI/CD Pipelines (Jenkins & GitHub Actions)](#cicd-pipelines-jenkins--github-actions)
-9. [AWS Cloud Deployment (ECS Fargate & RDS)](#aws-cloud-deployment-ecs-fargate--rds)
-10. [API Documentation & Postman Collection](#api-documentation--postman-collection)
-11. [Portfolio & Technical Interview Talking Points](#portfolio--technical-interview-talking-points)
+5. [100% Free 24/7 Cloud Deployment (Vercel + Render + Neon)](#100-free-247-cloud-deployment-vercel--render--neon)
+6. [Quickstart: Local Docker Compose](#quickstart-local-docker-compose)
+7. [Local Development Setup](#local-development-setup)
+8. [Kubernetes Deployment (Minikube / Cloud)](#kubernetes-deployment-minikube--cloud)
+9. [CI/CD Pipelines (Jenkins & GitHub Actions)](#cicd-pipelines-jenkins--github-actions)
+10. [AWS Cloud Deployment (ECS Fargate & RDS)](#aws-cloud-deployment-ecs-fargate--rds)
+11. [API Documentation & Postman Collection](#api-documentation--postman-collection)
+12. [Portfolio & Technical Interview Talking Points](#portfolio--technical-interview-talking-points)
 
 ---
 
@@ -127,8 +128,20 @@ This issues a native SQL `SELECT ... FOR UPDATE`, guaranteeing that competing ch
 - **Backend:** Java 21, Spring Boot 3.3.5, Spring Cloud 2023.0.3, Spring Cloud Gateway, OpenFeign, Resilience4j, Spring Security 6, Spring Data JPA, Flyway, Maven.
 - **Frontend:** Angular 18 (Standalone Components), TypeScript, RxJS, Modern CSS3 Flexbox/Grid, Nginx.
 - **Database:** PostgreSQL 16.
-- **DevOps & Cloud:** Docker, Docker Compose, Kubernetes (Deployments, Services, ConfigMaps, Secrets, HPAs, Ingress), Jenkins, GitHub Actions, AWS ECS Fargate, AWS RDS PostgreSQL, AWS ALB, Amazon ECR, Terraform IaC.
+- **DevOps & Cloud:** Docker, Docker Compose, Kubernetes (Deployments, Services, ConfigMaps, Secrets, HPAs, Ingress), Jenkins, GitHub Actions, AWS ECS Fargate, AWS RDS PostgreSQL, AWS ALB, Amazon ECR, Terraform IaC, Vercel, Render.
 - **Testing:** JUnit 5, Mockito, AssertJ, Spring Boot Test, Postman.
+
+---
+
+## 100% Free 24/7 Cloud Deployment (Vercel + Render + Neon)
+
+You can deploy the complete live, working platform **100% free with no credit card required**, running 24/7 even when your laptop is turned off:
+
+- **Frontend:** Deployed to **Vercel** (Global edge CDN, automated HTTPS)
+- **Backend:** Deployed to **Render.com** via `services/cloudcart-unified` (Modular Spring Boot 3 cloud runtime with dynamic port binding and `-Xmx320m` memory optimization fitting within Render's free 512MB RAM tier)
+- **Database:** Hosted on **Neon.tech** (Serverless PostgreSQL with SSL)
+
+👉 **[Read the Complete Free Deployment Step-by-Step Guide](file:///Users/omugale/.gemini/antigravity/scratch/cloudcart/documentation/DEPLOYMENT_FREE_TIER.md)**
 
 ---
 

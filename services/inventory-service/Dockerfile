@@ -6,7 +6,7 @@ WORKDIR /app
 RUN addgroup -S cloudcart && adduser -S cloudcart -G cloudcart
 USER cloudcart:cloudcart
 
-COPY target/*.jar app.jar
+COPY target/*-exec.jar app.jar
 
 ENV PORT=8086 \
     SPRING_PROFILES_ACTIVE=docker

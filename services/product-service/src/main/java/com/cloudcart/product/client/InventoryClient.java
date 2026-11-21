@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "inventory-service", url = "${inventory.service.url:http://localhost:8086}", fallback = InventoryClientFallback.class)
+@FeignClient(name = "inventory-service", contextId = "productInventoryClient", url = "${inventory.service.url:http://localhost:8086}", fallback = InventoryClientFallback.class)
 public interface InventoryClient {
 
     @GetMapping("/api/v1/inventory/stock/{sku}")

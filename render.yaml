@@ -1,0 +1,26 @@
+# Render Blueprint Specification for CloudCart Backend
+# Deploys on Render Free Tier (100% Free - 512MB RAM, 750 free instance hours/month)
+services:
+  - type: web
+    name: cloudcart-backend
+    env: docker
+    dockerfilePath: ./services/cloudcart-unified/Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    branch: master
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        value: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      - key: SPRING_DATASOURCE_URL
+        placeholder: "jdbc:postgresql://<neon-subdomain>.neon.tech/neondb?sslmode=require"
+      - key: SPRING_DATASOURCE_USERNAME
+        placeholder: "neondb_owner"
+      - key: SPRING_DATASOURCE_PASSWORD
+        placeholder: "your-neon-password"
