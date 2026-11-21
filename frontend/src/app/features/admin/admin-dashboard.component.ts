@@ -34,7 +34,7 @@ import { ApiResponse } from '../../core/models/api.model';
             <span class="metric-label">Total Revenue</span>
             <span class="metric-icon">💰</span>
           </div>
-          <div class="metric-value">\${{ totalRevenue | number:'1.2-2' }}</div>
+          <div class="metric-value">₹{{ totalRevenue | number:'1.2-2' }}</div>
           <span class="metric-sub text-success">From {{ totalOrdersCount }} customer orders</span>
         </div>
 
@@ -105,7 +105,7 @@ import { ApiResponse } from '../../core/models/api.model';
                 </td>
                 <td>{{ order.userEmail || ('User #' + order.userId) }}</td>
                 <td class="text-muted">{{ order.createdAt | date:'short' }}</td>
-                <td class="font-bold">\${{ order.totalAmount | number:'1.2-2' }}</td>
+                <td class="font-bold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
                     {{ order.status }}
@@ -155,7 +155,7 @@ import { ApiResponse } from '../../core/models/api.model';
                 <td class="font-mono">{{ product.sku }}</td>
                 <td class="font-bold">{{ product.name }}</td>
                 <td>{{ product.categoryName || 'General' }}</td>
-                <td class="font-bold">\${{ product.price | number:'1.2-2' }}</td>
+                <td class="font-bold">₹{{ product.price | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="product.active ? 'badge-success' : 'badge-danger'">
                     {{ product.active ? 'Active' : 'Inactive' }}
@@ -225,8 +225,8 @@ import { ApiResponse } from '../../core/models/api.model';
                 <input type="text" formControlName="sku" class="form-control" placeholder="PROD-DEVICE-01" />
               </div>
               <div class="form-group">
-                <label class="form-label">Price (\$) *</label>
-                <input type="number" formControlName="price" class="form-control" placeholder="99.99" step="0.01" />
+                <label class="form-label">Price (₹) *</label>
+                <input type="number" formControlName="price" class="form-control" placeholder="1499.00" step="0.01" />
               </div>
             </div>
 

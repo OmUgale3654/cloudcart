@@ -38,11 +38,11 @@ import { Category, Product } from '../../../core/models/product.model';
 
             <!-- Price Range Filter -->
             <div class="filter-group">
-              <label class="filter-title">Max Price: \${{ maxPrice }}</label>
-              <input type="range" min="10" max="500" step="10" [(ngModel)]="maxPrice" (change)="applyFilters()" class="range-slider" />
+              <label class="filter-title">Max Price: ₹{{ maxPrice | number }}</label>
+              <input type="range" min="500" max="50000" step="500" [(ngModel)]="maxPrice" (change)="applyFilters()" class="range-slider" />
               <div class="price-range-labels">
-                <span>\$10</span>
-                <span>\$500</span>
+                <span>₹500</span>
+                <span>₹50,000</span>
               </div>
             </div>
 
@@ -85,7 +85,7 @@ import { Category, Product } from '../../../core/models/product.model';
                 </h3>
                 <p class="product-desc">{{ product.description }}</p>
                 <div class="product-footer">
-                  <span class="product-price">\${{ product.price | number:'1.2-2' }}</span>
+                  <span class="product-price">₹{{ product.price | number:'1.2-2' }}</span>
                   <button (click)="addToCart(product.id)" class="btn btn-sm btn-primary">
                     + Add to Cart
                   </button>
@@ -311,7 +311,7 @@ export class ProductListComponent implements OnInit {
 
   selectedCategoryId: number | null = null;
   keyword = '';
-  maxPrice = 500;
+  maxPrice = 50000;
   sortBy = 'createdAt,desc';
 
   currentPage = 0;
@@ -337,7 +337,7 @@ export class ProductListComponent implements OnInit {
     this.productService.searchProducts({
       categoryId: this.selectedCategoryId || undefined,
       keyword: this.keyword.trim() || undefined,
-      maxPrice: this.maxPrice < 500 ? this.maxPrice : undefined,
+      maxPrice: this.maxPrice < 50000 ? this.maxPrice : undefined,
       page: this.currentPage,
       size: 9,
       sortBy: sortField,
@@ -366,7 +366,7 @@ export class ProductListComponent implements OnInit {
   resetFilters() {
     this.selectedCategoryId = null;
     this.keyword = '';
-    this.maxPrice = 500;
+    this.maxPrice = 50000;
     this.sortBy = 'createdAt,desc';
     this.currentPage = 0;
     this.router.navigate(['/products']);

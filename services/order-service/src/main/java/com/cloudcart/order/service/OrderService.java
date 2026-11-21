@@ -133,7 +133,7 @@ public class OrderService {
                 .orderNumber(orderNumber)
                 .userId(userId)
                 .amount(totalAmount)
-                .currency("USD")
+                .currency("INR")
                 .paymentMethod(request.getPaymentMethod())
                 .paymentToken(request.getPaymentToken())
                 .idempotencyKey(orderNumber)

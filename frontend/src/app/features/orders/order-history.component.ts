@@ -23,7 +23,7 @@ import { Order } from '../../core/models/order.model';
               <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
                 {{ order.status }}
               </span>
-              <span class="order-total">\${{ order.totalAmount | number:'1.2-2' }}</span>
+              <span class="order-total">₹{{ order.totalAmount | number:'1.2-2' }}</span>
             </div>
           </div>
 
@@ -32,7 +32,7 @@ import { Order } from '../../core/models/order.model';
               <div *ngFor="let item of order.items" class="preview-item">
                 <span class="item-name">{{ item.productName }}</span>
                 <span class="item-qty">Qty: {{ item.quantity }}</span>
-                <span class="item-sub">\${{ item.subtotal | number:'1.2-2' }}</span>
+                <span class="item-sub">₹{{ item.subtotal | number:'1.2-2' }}</span>
               </div>
             </div>
 

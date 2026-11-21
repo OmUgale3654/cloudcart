@@ -92,9 +92,9 @@ import { Order } from '../../core/models/order.model';
                 <tr *ngFor="let item of order.items">
                   <td class="item-title">{{ item.productName }}</td>
                   <td class="text-muted">{{ item.sku }}</td>
-                  <td>\${{ item.unitPrice | number:'1.2-2' }}</td>
+                  <td>₹{{ item.unitPrice | number:'1.2-2' }}</td>
                   <td>{{ item.quantity }}</td>
-                  <td class="text-right font-bold">\${{ item.subtotal | number:'1.2-2' }}</td>
+                  <td class="text-right font-bold">₹{{ item.subtotal | number:'1.2-2' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -124,20 +124,20 @@ import { Order } from '../../core/models/order.model';
             <h3 class="side-heading">Financial Summary</h3>
             <div class="calc-row">
               <span>Subtotal:</span>
-              <span>\${{ order.subtotal | number:'1.2-2' }}</span>
+              <span>₹{{ order.subtotal | number:'1.2-2' }}</span>
             </div>
             <div class="calc-row">
-              <span>Tax (8%):</span>
-              <span>\${{ order.taxAmount | number:'1.2-2' }}</span>
+              <span>GST (18%):</span>
+              <span>₹{{ order.taxAmount | number:'1.2-2' }}</span>
             </div>
             <div class="calc-row">
               <span>Shipping:</span>
-              <span>\${{ order.shippingCost | number:'1.2-2' }}</span>
+              <span>₹{{ order.shippingCost | number:'1.2-2' }}</span>
             </div>
             <div class="calc-divider"></div>
             <div class="calc-row total">
               <span>Grand Total:</span>
-              <span class="total-price">\${{ order.totalAmount | number:'1.2-2' }}</span>
+              <span class="total-price">₹{{ order.totalAmount | number:'1.2-2' }}</span>
             </div>
           </div>
         </div>

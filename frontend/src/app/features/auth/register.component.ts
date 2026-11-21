@@ -22,17 +22,17 @@ import { NotificationService } from '../../core/services/notification.service';
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label">First Name *</label>
-              <input type="text" formControlName="firstName" class="form-control" placeholder="Jane" />
+              <input type="text" formControlName="firstName" class="form-control" placeholder="Aarav" />
             </div>
             <div class="form-group">
               <label class="form-label">Last Name *</label>
-              <input type="text" formControlName="lastName" class="form-control" placeholder="Doe" />
+              <input type="text" formControlName="lastName" class="form-control" placeholder="Sharma" />
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Email Address *</label>
-            <input type="email" formControlName="email" class="form-control" placeholder="jane.doe@example.com" />
+            <input type="email" formControlName="email" class="form-control" placeholder="aarav.sharma@example.com" />
             <span class="form-error" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
               Valid email is required.
             </span>
@@ -48,26 +48,26 @@ import { NotificationService } from '../../core/services/notification.service';
 
           <div class="form-group">
             <label class="form-label">Phone Number</label>
-            <input type="tel" formControlName="phone" class="form-control" placeholder="+1 (555) 000-0000" />
+            <input type="tel" formControlName="phone" class="form-control" placeholder="+91 98765 43210" />
           </div>
 
           <div class="form-group">
             <label class="form-label">Street Address</label>
-            <input type="text" formControlName="street" class="form-control" placeholder="123 Main Street" />
+            <input type="text" formControlName="street" class="form-control" placeholder="12 Brigade Road" />
           </div>
 
           <div class="form-grid-3">
             <div class="form-group">
               <label class="form-label">City</label>
-              <input type="text" formControlName="city" class="form-control" placeholder="Seattle" />
+              <input type="text" formControlName="city" class="form-control" placeholder="Bengaluru" />
             </div>
             <div class="form-group">
               <label class="form-label">State</label>
-              <input type="text" formControlName="state" class="form-control" placeholder="WA" />
+              <input type="text" formControlName="state" class="form-control" placeholder="Karnataka" />
             </div>
             <div class="form-group">
-              <label class="form-label">Zip Code</label>
-              <input type="text" formControlName="zipCode" class="form-control" placeholder="98101" />
+              <label class="form-label">PIN Code</label>
+              <input type="text" formControlName="zipCode" class="form-control" placeholder="560001" />
             </div>
           </div>
 
@@ -136,7 +136,7 @@ export class RegisterComponent {
     city: [''],
     state: [''],
     zipCode: [''],
-    country: ['USA']
+    country: ['India']
   });
 
   onSubmit() {

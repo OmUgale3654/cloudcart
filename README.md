@@ -157,8 +157,10 @@ docker compose logs -f
 
 | Role | Email | Password | Access Capabilities |
 |---|---|---|---|
-| **Admin** | `admin@cloudcart.internal` | `admin123` | Full Admin Dashboard, Product Creation, Order Status Updates |
-| **Customer** | `customer@example.com` | `password123` | Browsing, Cart, Simulated Checkout, Order History |
+| **Admin (Primary)** | `admin@cloudcart.com` | `Admin123!` | Full Admin Dashboard, Catalog Management, Order Status Updates |
+| **Customer (Primary)** | `customer@cloudcart.com` | `Customer123!` | Browsing, Cart, Simulated Checkout, Order Tracking |
+| **Admin (Alternative)** | `admin@cloudcart.internal` | `admin123` | Secondary Admin Account |
+| **Customer (Alternative)** | `customer@example.com` | `password123` | Secondary Customer Account |
 
 ---
 

@@ -44,7 +44,7 @@ import { Product } from '../../../core/models/product.model';
           </div>
 
           <h1 class="detail-title">{{ product.name }}</h1>
-          <div class="detail-price">\${{ product.price | number:'1.2-2' }}</div>
+          <div class="detail-price">₹{{ product.price | number:'1.2-2' }}</div>
 
           <p class="detail-description">{{ product.description }}</p>
 

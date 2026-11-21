@@ -42,7 +42,7 @@ class PaymentServiceTest {
                 .orderNumber("ORD-20261121-001")
                 .userId(10L)
                 .amount(new BigDecimal("149.99"))
-                .currency("USD")
+                .currency("INR")
                 .status(PaymentStatus.SUCCESS)
                 .paymentMethod(PaymentMethod.SIMULATED_GATEWAY)
                 .idempotencyKey("KEY-12345")

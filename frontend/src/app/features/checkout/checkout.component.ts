@@ -145,30 +145,30 @@ import { Cart } from '../../core/models/cart.model';
                 <img [src]="item.imageUrl" [alt]="item.productName" class="item-thumb" />
                 <div class="item-text">
                   <span class="name">{{ item.productName }}</span>
-                  <span class="qty">Qty: {{ item.quantity }} × \${{ item.unitPrice }}</span>
+                  <span class="qty">Qty: {{ item.quantity }} × ₹{{ item.unitPrice | number:'1.2-2' }}</span>
                 </div>
-                <span class="item-price">\${{ item.subtotal | number:'1.2-2' }}</span>
+                <span class="item-price">₹{{ item.subtotal | number:'1.2-2' }}</span>
               </div>
             </div>
 
             <div class="summary-calc mt-4">
               <div class="calc-row">
                 <span>Subtotal</span>
-                <span>\${{ cart.totalAmount | number:'1.2-2' }}</span>
+                <span>₹{{ cart.totalAmount | number:'1.2-2' }}</span>
               </div>
               <div class="calc-row">
-                <span>Sales Tax (8%)</span>
-                <span>\${{ getEstimatedTax() | number:'1.2-2' }}</span>
+                <span>GST (18%)</span>
+                <span>₹{{ getEstimatedTax() | number:'1.2-2' }}</span>
               </div>
               <div class="calc-row">
                 <span>Shipping</span>
                 <span *ngIf="getShippingCost() === 0" class="text-success font-bold">FREE</span>
-                <span *ngIf="getShippingCost() > 0">\${{ getShippingCost() | number:'1.2-2' }}</span>
+                <span *ngIf="getShippingCost() > 0">₹{{ getShippingCost() | number:'1.2-2' }}</span>
               </div>
               <div class="calc-divider"></div>
               <div class="calc-row total">
                 <span>Total Amount</span>
-                <span class="price">\${{ getEstimatedTotal() | number:'1.2-2' }}</span>
+                <span class="price">₹{{ getEstimatedTotal() | number:'1.2-2' }}</span>
               </div>
             </div>
           </div>
@@ -315,11 +315,11 @@ export class CheckoutComponent implements OnInit {
   isSubmitting = false;
 
   checkoutForm: FormGroup = this.fb.group({
-    street: ['100 Enterprise Way, Suite 400', Validators.required],
-    city: ['San Francisco', Validators.required],
-    state: ['CA', Validators.required],
-    zipCode: ['94105', Validators.required],
-    country: ['United States', Validators.required],
+    street: ['100 Tech Park, Whitefield', Validators.required],
+    city: ['Bengaluru', Validators.required],
+    state: ['Karnataka', Validators.required],
+    zipCode: ['560066', Validators.required],
+    country: ['India', Validators.required],
     paymentToken: ['CARD_SUCCESS', Validators.required]
   });
 
@@ -345,12 +345,12 @@ export class CheckoutComponent implements OnInit {
   }
 
   getEstimatedTax(): number {
-    return this.cart ? +(this.cart.totalAmount * 0.08).toFixed(2) : 0;
+    return this.cart ? +(this.cart.totalAmount * 0.18).toFixed(2) : 0;
   }
 
   getShippingCost(): number {
     if (!this.cart) return 0;
-    return this.cart.totalAmount >= 50 ? 0 : 9.99;
+    return this.cart.totalAmount >= 999 ? 0 : 99.00;
   }
 
   getEstimatedTotal(): number {

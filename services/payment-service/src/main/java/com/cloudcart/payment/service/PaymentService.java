@@ -67,7 +67,7 @@ public class PaymentService {
                 .orderNumber(request.getOrderNumber())
                 .userId(request.getUserId())
                 .amount(request.getAmount())
-                .currency(request.getCurrency() != null ? request.getCurrency() : "USD")
+                .currency(request.getCurrency() != null ? request.getCurrency() : "INR")
                 .status(status)
                 .paymentMethod(request.getPaymentMethod())
                 .idempotencyKey(request.getIdempotencyKey())

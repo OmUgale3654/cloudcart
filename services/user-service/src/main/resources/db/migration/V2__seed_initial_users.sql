@@ -1,46 +1,86 @@
 -- Seed Initial Admin and Customer
 -- Admin credentials: admin@cloudcart.com / Admin123!
 -- Customer credentials: customer@cloudcart.com / Customer123!
--- BCrypt password hashes generated with strength 10:
--- Admin123! -> $2a$10$qR6mC1u3B.p1qZ9V6x1uXe7vJkY3aE8tF0gH1iJ2kL3mN4oP5qR6s
--- Customer123! -> $2a$10$8.7zR6mC1u3B.p1qZ9V6x1uXe7vJkY3aE8tF0gH1iJ2kL3mN4oP5q
+-- Alternative credentials:
+-- admin@cloudcart.internal / admin123
+-- customer@example.com / password123
 
 INSERT INTO users (email, password, first_name, last_name, role, phone, street, city, state, zip_code, country, enabled, created_at, updated_at)
 VALUES 
 (
     'admin@cloudcart.com',
-    '$2a$10$uA3f044c3s/w7vYQ1gR8Ue8wO3M4zZ5/s2z9V0e6r2t1y5u9i0oP.',
+    '$2a$10$2EcTgXtAfXpCwayeZi1sq.8m9ZFlZrTuOx3UpNnRb/MS1uvc1CR5C',
     'System',
     'Admin',
     'ROLE_ADMIN',
-    '+1 (555) 019-2834',
-    '100 Enterprise Way',
-    'San Francisco',
-    'CA',
-    '94105',
-    'USA',
+    '+91 98765 43210',
+    '100 Tech Park, Whitefield',
+    'Bengaluru',
+    'Karnataka',
+    '560066',
+    'India',
     TRUE,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
 )
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
 
 INSERT INTO users (email, password, first_name, last_name, role, phone, street, city, state, zip_code, country, enabled, created_at, updated_at)
 VALUES 
 (
     'customer@cloudcart.com',
-    '$2a$10$uA3f044c3s/w7vYQ1gR8Ue8wO3M4zZ5/s2z9V0e6r2t1y5u9i0oP.',
-    'Jane',
-    'Doe',
+    '$2a$10$zFrnLPUL3N1u6Zfc/h8KOOWOMUdmXHSCbcDf/b4YaVhD/pIx6WDUi',
+    'Aarav',
+    'Patel',
     'ROLE_CUSTOMER',
-    '+1 (555) 987-6543',
-    '742 Evergreen Terrace',
-    'Springfield',
-    'OR',
-    '97477',
-    'USA',
+    '+91 98765 12345',
+    '42 Brigade Road',
+    'Bengaluru',
+    'Karnataka',
+    '560025',
+    'India',
     TRUE,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
 )
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
+
+INSERT INTO users (email, password, first_name, last_name, role, phone, street, city, state, zip_code, country, enabled, created_at, updated_at)
+VALUES 
+(
+    'admin@cloudcart.internal',
+    '$2a$10$F2T/wbB83ZpVhAwZsSzm6uBtVbwFf6zQ2ttmWGXBLSWnbHGEEznri',
+    'CloudCart',
+    'Admin',
+    'ROLE_ADMIN',
+    '+91 98111 22334',
+    'Tower B, Cyber City',
+    'Gurugram',
+    'Haryana',
+    '122002',
+    'India',
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
+
+INSERT INTO users (email, password, first_name, last_name, role, phone, street, city, state, zip_code, country, enabled, created_at, updated_at)
+VALUES 
+(
+    'customer@example.com',
+    '$2a$10$OpJfT1yptdyFvGC4wBtt9uFdCN4DdAVT/ygzIfDiewfpTNylooO1W',
+    'Priya',
+    'Sharma',
+    'ROLE_CUSTOMER',
+    '+91 98222 33445',
+    '12 Marine Drive',
+    'Mumbai',
+    'Maharashtra',
+    '400020',
+    'India',
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;

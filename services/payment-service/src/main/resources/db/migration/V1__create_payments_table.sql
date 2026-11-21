@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS payments (
     order_number VARCHAR(100) NOT NULL,
     user_id BIGINT NOT NULL,
     amount NUMERIC(12, 2) NOT NULL,
-    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    currency VARCHAR(10) NOT NULL DEFAULT 'INR',
     status VARCHAR(50) NOT NULL,
     payment_method VARCHAR(50) NOT NULL,
     idempotency_key VARCHAR(128) UNIQUE,

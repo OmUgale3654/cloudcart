@@ -28,7 +28,7 @@ public class PaymentRequest {
     private BigDecimal amount;
 
     @Builder.Default
-    private String currency = "USD";
+    private String currency = "INR";
 
     @Builder.Default
     private PaymentMethod paymentMethod = PaymentMethod.SIMULATED_GATEWAY;

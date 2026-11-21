@@ -108,7 +108,7 @@ import { Category, Product } from '../../core/models/product.model';
               </h3>
               <p class="product-desc">{{ product.description }}</p>
               <div class="product-footer">
-                <span class="product-price">\${{ product.price | number:'1.2-2' }}</span>
+                <span class="product-price">₹{{ product.price | number:'1.2-2' }}</span>
                 <button (click)="addToCart(product.id)" class="btn btn-sm btn-primary">
                   + Add to Cart
                 </button>

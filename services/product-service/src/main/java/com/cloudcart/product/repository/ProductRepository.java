@@ -1,3 +1,4 @@
+
 package com.cloudcart.product.repository;
 
 import com.cloudcart.product.entity.Product;
@@ -21,9 +22,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE " +
            "(:active IS NULL OR p.active = :active) AND " +
            "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
-           "(:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "(LOWER(p.name) LIKE LOWER(CONCAT('%', COALESCE(:keyword, ''), '%')) " +
+           "OR LOWER(p.description) LIKE LOWER(CONCAT('%', COALESCE(:keyword, ''), '%'))) AND " +
            "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR p.price <= :maxPrice)")
+
     Page<Product> searchProducts(
             @Param("keyword") String keyword,
             @Param("categoryId") Long categoryId,

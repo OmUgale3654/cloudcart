@@ -27,7 +27,7 @@ import { Cart } from '../../core/models/cart.model';
               <div class="item-details">
                 <span class="item-sku">SKU: {{ item.sku }}</span>
                 <h3 class="item-name">{{ item.productName }}</h3>
-                <span class="item-unit-price">\${{ item.unitPrice | number:'1.2-2' }} each</span>
+                <span class="item-unit-price">₹{{ item.unitPrice | number:'1.2-2' }} each</span>
               </div>
 
               <div class="item-quantity">
@@ -39,7 +39,7 @@ import { Cart } from '../../core/models/cart.model';
               </div>
 
               <div class="item-subtotal">
-                <span class="subtotal-amount">\${{ item.subtotal | number:'1.2-2' }}</span>
+                <span class="subtotal-amount">₹{{ item.subtotal | number:'1.2-2' }}</span>
               </div>
 
               <button (click)="removeItem(item.id)" class="btn-remove" title="Remove item">
@@ -57,26 +57,26 @@ import { Cart } from '../../core/models/cart.model';
             <div class="summary-rows">
               <div class="summary-row">
                 <span>Subtotal</span>
-                <span>\${{ cart.totalAmount | number:'1.2-2' }}</span>
+                <span>₹{{ cart.totalAmount | number:'1.2-2' }}</span>
               </div>
               <div class="summary-row">
-                <span>Estimated Tax (8%)</span>
-                <span>\${{ getEstimatedTax() | number:'1.2-2' }}</span>
+                <span>Estimated GST (18%)</span>
+                <span>₹{{ getEstimatedTax() | number:'1.2-2' }}</span>
               </div>
               <div class="summary-row">
                 <span>Shipping</span>
                 <span *ngIf="getShippingCost() === 0" class="text-success font-bold">FREE</span>
-                <span *ngIf="getShippingCost() > 0">\${{ getShippingCost() | number:'1.2-2' }}</span>
+                <span *ngIf="getShippingCost() > 0">₹{{ getShippingCost() | number:'1.2-2' }}</span>
               </div>
-              <div class="free-shipping-hint" *ngIf="cart.totalAmount < 50">
-                Add <strong>\${{ (50 - cart.totalAmount) | number:'1.2-2' }}</strong> more to qualify for FREE shipping!
+              <div class="free-shipping-hint" *ngIf="cart.totalAmount < 999">
+                Add <strong>₹{{ (999 - cart.totalAmount) | number:'1.2-2' }}</strong> more to qualify for FREE shipping!
               </div>
 
               <div class="summary-divider"></div>
 
               <div class="summary-row total-row">
                 <span>Estimated Total</span>
-                <span class="total-amount">\${{ getEstimatedTotal() | number:'1.2-2' }}</span>
+                <span class="total-amount">₹{{ getEstimatedTotal() | number:'1.2-2' }}</span>
               </div>
             </div>
 
@@ -262,12 +262,12 @@ export class CartViewComponent implements OnInit {
   }
 
   getEstimatedTax(): number {
-    return this.cart ? +(this.cart.totalAmount * 0.08).toFixed(2) : 0;
+    return this.cart ? +(this.cart.totalAmount * 0.18).toFixed(2) : 0;
   }
 
   getShippingCost(): number {
     if (!this.cart) return 0;
-    return this.cart.totalAmount >= 50 ? 0 : 9.99;
+    return this.cart.totalAmount >= 999 ? 0 : 99.00;
   }
 
   getEstimatedTotal(): number {
