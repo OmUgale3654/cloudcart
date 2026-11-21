@@ -1,0 +1,536 @@
+{
+  "info": {
+    "name": "CloudCart Enterprise API Collection",
+    "description": "Production API Collection for CloudCart Cloud-Native Microservices Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Authentication & Users",
+      "item": [
+        {
+          "name": "Customer Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.customer@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Taylor\",\n  \"phone\": \"+1-555-0199\",\n  \"address\": \"742 Evergreen Terrace\",\n  \"city\": \"Springfield\",\n  \"state\": \"OR\",\n  \"postalCode\": \"97477\",\n  \"country\": \"USA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Registration successful with HTTP 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    if (json.data && json.data.token) {",
+                  "        pm.environment.set('jwt_token', json.data.token);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Customer Login (Save JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login returns token with HTTP 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.data.token).to.not.be.empty;",
+                  "    pm.environment.set('jwt_token', json.data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Login (Save Admin JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@cloudcart.internal\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.environment.set('admin_jwt_token', json.data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Products & Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Search & Filter Products (Paginated)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/products?page=0&size=10&sort=createdAt,desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "createdAt,desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by SKU",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/sku/PROD-KEYBOARD-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "sku", "PROD-KEYBOARD-01"]
+            }
+          }
+        },
+        {
+          "name": "Admin Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PROD-CUSTOM-99\",\n  \"name\": \"CloudCart Pro Headset\",\n  \"description\": \"Active noise-cancelling premium headphones\",\n  \"price\": 199.99,\n  \"categoryId\": 1,\n  \"imageUrl\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e\",\n  \"initialStock\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Inventory Management",
+      "item": [
+        {
+          "name": "Get Stock Level by SKU",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/inventory/PROD-KEYBOARD-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "inventory", "PROD-KEYBOARD-01"]
+            }
+          }
+        },
+        {
+          "name": "Reserve Stock (Transactional Check)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"PROD-KEYBOARD-01\",\n      \"quantity\": 2\n    }\n  ],\n  \"orderReference\": \"REF-MANUAL-TEST\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/inventory/reserve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "inventory", "reserve"]
+            }
+          }
+        },
+        {
+          "name": "Release Reserved Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"PROD-KEYBOARD-01\",\n      \"quantity\": 2\n    }\n  ],\n  \"orderReference\": \"REF-MANUAL-TEST\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/inventory/release",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "inventory", "release"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Shopping Cart",
+      "item": [
+        {
+          "name": "Get Customer Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/cart",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PROD-KEYBOARD-01\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/cart/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/cart/items/PROD-KEYBOARD-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "cart", "items", "PROD-KEYBOARD-01"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/cart/items/PROD-KEYBOARD-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "cart", "items", "PROD-KEYBOARD-01"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Simulated Payments",
+      "item": [
+        {
+          "name": "Process Payment (Success Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderNumber\": \"ORD-SIM-101\",\n  \"userId\": 1,\n  \"amount\": 149.99,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentToken\": \"CARD_SUCCESS\",\n  \"idempotencyKey\": \"idem-key-test-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/process",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "process"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Payment succeeds with COMPLETED status', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.data.status).to.eql('COMPLETED');",
+                  "    pm.environment.set('current_payment_id', json.data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process Payment (Declined Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderNumber\": \"ORD-DECLINE-01\",\n  \"userId\": 1,\n  \"amount\": 89.99,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentToken\": \"CARD_DECLINED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/process",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "process"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Declined payment returns failed status or 400/402', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentId\": {{current_payment_id}},\n  \"amount\": 149.99,\n  \"reason\": \"Customer cancellation request\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/refund",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "refund"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Orders & Distributed Saga Checkout",
+      "item": [
+        {
+          "name": "Execute Checkout Saga (Success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingAddress\": \"742 Evergreen Terrace\",\n  \"shippingCity\": \"Springfield\",\n  \"shippingState\": \"OR\",\n  \"shippingPostalCode\": \"97477\",\n  \"shippingCountry\": \"USA\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentToken\": \"CARD_SUCCESS\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/checkout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "checkout"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Checkout Saga succeeds with CONFIRMED order', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.data.status).to.eql('CONFIRMED');",
+                  "    pm.environment.set('current_order_number', json.data.orderNumber);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Execute Checkout Saga (Failure & Compensating Rollback)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingAddress\": \"742 Evergreen Terrace\",\n  \"shippingCity\": \"Springfield\",\n  \"shippingState\": \"OR\",\n  \"shippingPostalCode\": \"97477\",\n  \"shippingCountry\": \"USA\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentToken\": \"CARD_DECLINED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/checkout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "checkout"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Declined checkout triggers Saga rollback and payment failure', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Customer Order History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order By Order Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{current_order_number}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{current_order_number}}"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Order (Trigger Stock Release & Payment Refund)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{current_order_number}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{current_order_number}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Notifications & Audit Logs",
+      "item": [
+        {
+          "name": "Get User Notification History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/user/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "user", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        AWS_DEFAULT_REGION   = 'us-east-1'
+        AWS_ACCOUNT_ID       = credentials('AWS_ACCOUNT_ID')
+        ECR_REGISTRY         = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+        ECS_CLUSTER          = 'cloudcart-cluster-prod'
+        IMAGE_TAG             = "${BUILD_NUMBER}-${GIT_COMMIT[0..7]}"
+        DOCKER_CREDS         = credentials('aws-ecr-credentials')
+        SPRING_PROFILES_ACTIVE = 'prod'
+    }
+
+    stages {
+        stage('1. Checkout Source') {
+            steps {
+                echo "Checking out repository branch ${BRANCH_NAME}..."
+                checkout scm
+                sh 'git log -1 --pretty=format:"Commit: %h by %an on %cd (%s)"'
+            }
+        }
+
+        stage('2. Verify Toolchains') {
+            steps {
+                echo "Verifying build tools..."
+                sh 'java -version'
+                sh './mvnw -version'
+                sh 'node -v'
+                sh 'npm -v'
+                sh 'docker version'
+                sh 'aws --version || echo "AWS CLI available via agent plugins"'
+            }
+        }
+
+        stage('3. Backend Unit & Integration Tests') {
+            steps {
+                echo "Compiling and testing all microservices..."
+                sh './mvnw clean test'
+            }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+                }
+            }
+        }
+
+        stage('4. Backend Package & Artifact Verification') {
+            steps {
+                echo "Packaging microservice JAR binaries..."
+                sh './mvnw clean package -DskipTests=true'
+                sh 'ls -lh services/*/target/*.jar'
+            }
+        }
+
+        stage('5. Frontend Build & Static Analysis') {
+            steps {
+                echo "Building Angular production distribution..."
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm run build'
+                    sh 'test -d dist/cloudcart-frontend/browser || test -d dist/cloudcart-frontend'
+                }
+            }
+        }
+
+        stage('6. Docker Images Build') {
+            parallel {
+                stage('Build API Gateway') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-api-gateway:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-api-gateway:latest services/api-gateway"
+                    }
+                }
+                stage('Build User Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-user-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-user-service:latest services/user-service"
+                    }
+                }
+                stage('Build Product Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-product-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-product-service:latest services/product-service"
+                    }
+                }
+                stage('Build Inventory Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-inventory-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-inventory-service:latest services/inventory-service"
+                    }
+                }
+                stage('Build Cart Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-cart-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-cart-service:latest services/cart-service"
+                    }
+                }
+                stage('Build Order Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-order-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-order-service:latest services/order-service"
+                    }
+                }
+                stage('Build Payment Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-payment-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-payment-service:latest services/payment-service"
+                    }
+                }
+                stage('Build Notification Service') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-notification-service:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-notification-service:latest services/notification-service"
+                    }
+                }
+                stage('Build Frontend UI') {
+                    steps {
+                        sh "docker build -t ${ECR_REGISTRY}/cloudcart-frontend:${IMAGE_TAG} -t ${ECR_REGISTRY}/cloudcart-frontend:latest frontend"
+                    }
+                }
+            }
+        }
+
+        stage('7. Push Docker Images to AWS ECR') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                script {
+                    echo "Logging into AWS Elastic Container Registry (ECR)..."
+                    sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+
+                    def services = [
+                        'api-gateway', 'user-service', 'product-service', 'inventory-service',
+                        'cart-service', 'order-service', 'payment-service', 'notification-service',
+                        'frontend'
+                    ]
+
+                    for (svc in services) {
+                        echo "Pushing ${svc} to ${ECR_REGISTRY}..."
+                        sh "docker push ${ECR_REGISTRY}/cloudcart-${svc}:${IMAGE_TAG}"
+                        sh "docker push ${ECR_REGISTRY}/cloudcart-${svc}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('8. Deploy to AWS ECS / EKS') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                script {
+                    echo "Deploying rolling update to AWS ECS Cluster: ${ECS_CLUSTER}..."
+                    def ecsServices = [
+                        'api-gateway', 'user-service', 'product-service', 'inventory-service',
+                        'cart-service', 'order-service', 'payment-service', 'notification-service',
+                        'frontend'
+                    ]
+
+                    for (svc in ecsServices) {
+                        echo "Updating ECS service: cloudcart-${svc}-service..."
+                        sh """
+                            aws ecs update-service \
+                                --cluster ${ECS_CLUSTER} \
+                                --service cloudcart-${svc}-service \
+                                --force-new-deployment \
+                                --region ${AWS_DEFAULT_REGION}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('9. Health Verification & Smoke Tests') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                echo "Verifying application health post-deployment..."
+                script {
+                    // Poll ALB endpoint for API Gateway Actuator Health
+                    sh '''
+                        APP_ENDPOINT="${ALB_DNS_NAME:-http://localhost:8080}"
+                        echo "Probing API Gateway health at ${APP_ENDPOINT}/actuator/health..."
+                        for i in $(seq 1 12); do
+                            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${APP_ENDPOINT}/actuator/health" || true)
+                            if [ "$STATUS" = "200" ]; then
+                                echo "Health check passed with HTTP 200!"
+                                break
+                            fi
+                            echo "Attempt $i: Gateway returned HTTP $STATUS. Retrying in 10s..."
+                            sleep 10
+                        done
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline succeeded! CloudCart build #${BUILD_NUMBER} deployed successfully."
+        }
+        failure {
+            echo "Pipeline failed! Please check logs for failure details."
+        }
+        always {
+            cleanWs deleteDirs: true, notFailBuild: true
+        }
+    }
+}

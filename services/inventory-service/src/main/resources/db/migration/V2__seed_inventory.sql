@@ -1,0 +1,14 @@
+-- Seed Initial Inventory Levels
+INSERT INTO inventory (sku, available_quantity, reserved_quantity, updated_at)
+VALUES 
+    ('PROD-HEADPHONE-01', 150, 0, CURRENT_TIMESTAMP),
+    ('PROD-SMARTWATCH-01', 85, 0, CURRENT_TIMESTAMP),
+    ('PROD-KEYBOARD-01', 200, 0, CURRENT_TIMESTAMP),
+    ('PROD-CHARGER-01', 300, 0, CURRENT_TIMESTAMP),
+    ('PROD-MOUSE-01', 120, 0, CURRENT_TIMESTAMP),
+    ('PROD-SPEAKER-01', 95, 0, CURRENT_TIMESTAMP),
+    ('PROD-BACKPACK-01', 110, 0, CURRENT_TIMESTAMP),
+    ('PROD-HUB-01', 175, 0, CURRENT_TIMESTAMP)
+ON CONFLICT (sku) DO UPDATE 
+SET available_quantity = EXCLUDED.available_quantity,
+    updated_at = CURRENT_TIMESTAMP;

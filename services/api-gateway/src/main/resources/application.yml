@@ -1,0 +1,103 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        # User Service Auth Routes (Public)
+        - id: user-auth-service
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/auth/**
+
+        # User Service User Profile Routes (Secured)
+        - id: user-profile-service
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Product Service Public Catalog Routes
+        - id: product-service-public
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/products/**, /api/v1/categories/**
+            - Method=GET
+
+        # Product Service Admin Routes (Secured)
+        - id: product-service-admin
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/products/**, /api/v1/categories/**
+            - Method=POST,PUT,DELETE,PATCH
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Cart Service Routes (Secured)
+        - id: cart-service
+          uri: ${CART_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/v1/cart/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Order Service Routes (Secured)
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Payment Service Routes (Secured)
+        - id: payment-service
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/v1/payments/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Inventory Service Routes (Secured)
+        - id: inventory-service
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:8086}
+          predicates:
+            - Path=/api/v1/inventory/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+        # Notification Service Routes (Secured)
+        - id: notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8087}
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - name: JwtAuthenticationFilter
+
+jwt:
+  # Base64 encoded 256-bit secret key for HMAC-SHA256
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expirationMs: ${JWT_EXPIRATION_MS:86400000} # 24 hours
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    com.cloudcart.gateway: DEBUG
