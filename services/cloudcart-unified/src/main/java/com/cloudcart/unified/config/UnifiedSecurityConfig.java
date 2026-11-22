@@ -65,7 +65,7 @@ public class UnifiedSecurityConfig {
                         // Public Product & Category Catalog Browsing
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**", "/api/v1/categories/**").permitAll()
                         // Health checks & Documentation
-                        .requestMatchers("/actuator/**", "/health", "/").permitAll()
+                        .requestMatchers("/actuator/**", "/health", "/api/health", "/").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Internal service communication endpoints
                         .requestMatchers("/api/v1/inventory/**", "/api/v1/payments/**", "/api/v1/notifications/**").permitAll()
