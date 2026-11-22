@@ -20,7 +20,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestControllerAdvice
+@RestControllerAdvice(name = "userExceptionHandler")
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);

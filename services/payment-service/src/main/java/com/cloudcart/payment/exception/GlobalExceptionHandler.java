@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestControllerAdvice
+@RestControllerAdvice(name = "paymentExceptionHandler")
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
