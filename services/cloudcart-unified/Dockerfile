@@ -9,11 +9,10 @@ WORKDIR /workspace
 
 # Copy parent POM and root build files
 COPY pom.xml ./
-COPY mvnw ./
-COPY .mvn .mvn
 
 # Copy all domain modules needed by cloudcart-unified
 COPY services/common-dto services/common-dto
+COPY services/api-gateway services/api-gateway
 COPY services/user-service services/user-service
 COPY services/product-service services/product-service
 COPY services/inventory-service services/inventory-service
