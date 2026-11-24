@@ -12,64 +12,129 @@ import { CartService } from '../../../core/services/cart.service';
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <header class="navbar-wrapper">
+      <!-- Myntra Style Top Offer / Architecture Bar -->
       <div class="top-announcement">
-        <span>🚀 <strong>CloudCart Cloud-Native Architecture</strong>: Spring Cloud Gateway • PostgreSQL • OpenFeign • Resilience4j</span>
+        <div class="container announcement-inner">
+          <span class="announcement-pill">⚡ TECH CARNIVAL</span>
+          <span class="announcement-text">
+            Up to <strong>60% OFF</strong> on Audio, Smartwatches & Gear • Free Delivery on Orders Over ₹999
+          </span>
+          <span class="announcement-code">CODE: <strong>CLOUDCART500</strong></span>
+        </div>
       </div>
 
       <nav class="navbar container">
+        <!-- Brand Monogram & Name -->
         <a routerLink="/" class="brand" (click)="closeMobileMenu()">
-          <div class="brand-icon">CC</div>
-          <span class="brand-name">Cloud<span>Cart</span></span>
+          <div class="brand-badge">
+            <span class="brand-monogram">CC</span>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">CLOUD<span>CART</span></span>
+            <span class="brand-tagline">LUXE TECH</span>
+          </div>
         </a>
 
-        <!-- Desktop Search Box -->
+        <!-- Category Nav Links (Myntra Style Header Navigation) -->
+        <div class="category-nav desktop-only">
+          <a routerLink="/products" class="cat-nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            ALL PRODUCTS
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 1 }" class="cat-nav-link" routerLinkActive="active">
+            AUDIO
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 2 }" class="cat-nav-link" routerLinkActive="active">
+            WEARABLES
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 3 }" class="cat-nav-link" routerLinkActive="active">
+            GAMING
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 4 }" class="cat-nav-link" routerLinkActive="active">
+            ACCESSORIES
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 5 }" class="cat-nav-link hot-deal" routerLinkActive="active">
+            SMART HOME <span class="hot-badge">NEW</span>
+          </a>
+        </div>
+
+        <!-- Myntra Capsule Search Bar -->
         <div class="search-box desktop-only">
+          <span class="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search products by title, SKU, or keyword..."
+            placeholder="Search for headphones, smartwatches, gear..."
             [(ngModel)]="searchKeyword"
             (keyup.enter)="onSearch()"
           />
-          <button (click)="onSearch()" aria-label="Search">🔍</button>
+          <button *ngIf="searchKeyword" (click)="searchKeyword = ''; onSearch()" class="clear-search-btn" title="Clear">✕</button>
         </div>
 
-        <!-- Desktop Navigation Actions -->
+        <!-- Desktop Right Actions (Myntra Vertical Icon + Label Style) -->
         <div class="nav-actions desktop-only">
-          <a routerLink="/products" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Catalog</a>
-
-          <a *ngIf="authService.isAdmin()" routerLink="/admin" class="admin-pill" routerLinkActive="active">
-            🛡️ Admin Portal
-          </a>
-
-          <a routerLink="/cart" class="cart-btn" routerLinkActive="active">
-            <span class="cart-icon">🛒</span>
-            <span class="cart-label">Cart</span>
-            <span class="cart-badge" *ngIf="(cartService.cartCount$ | async) as count">{{ count }}</span>
-          </a>
-
+          <!-- Profile Dropdown Trigger -->
           <ng-container *ngIf="authService.currentUser$ | async as user; else guestNav">
-            <div class="user-menu">
-              <a routerLink="/orders" class="user-greeting">
-                <span class="user-avatar">{{ user.firstName[0] }}</span>
-                <span class="user-name">{{ user.firstName }}</span>
+            <div class="action-item profile-dropdown-wrapper">
+              <a routerLink="/orders" class="action-link">
+                <span class="action-avatar">{{ user.firstName[0] }}</span>
+                <span class="action-label">{{ user.firstName }}</span>
               </a>
-              <button (click)="logout()" class="btn-logout" title="Sign Out">Sign Out</button>
+              <!-- Hover Menu -->
+              <div class="profile-dropdown-card">
+                <div class="user-greeting-box">
+                  <strong>Hello {{ user.firstName }} {{ user.lastName }}</strong>
+                  <span class="user-email-text">{{ user.email }}</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a routerLink="/orders" class="dropdown-link">📦 My Orders & Tracking</a>
+                <a *ngIf="authService.isAdmin()" routerLink="/admin" class="dropdown-link admin-link">
+                  🛡️ Admin Management
+                </a>
+                <div class="dropdown-divider"></div>
+                <button (click)="logout()" class="dropdown-logout-btn">Log Out</button>
+              </div>
             </div>
           </ng-container>
 
           <ng-template #guestNav>
-            <div class="auth-buttons">
-              <a routerLink="/auth/login" class="btn btn-sm btn-outline">Sign In</a>
-              <a routerLink="/auth/register" class="btn btn-sm btn-primary">Register</a>
+            <div class="action-item profile-dropdown-wrapper">
+              <a routerLink="/auth/login" class="action-link">
+                <span class="action-icon">👤</span>
+                <span class="action-label">Profile</span>
+              </a>
+              <div class="profile-dropdown-card guest-card">
+                <p class="guest-msg"><strong>Welcome to CloudCart</strong><br><small>To access wishlist & orders</small></p>
+                <a routerLink="/auth/login" class="btn btn-sm btn-primary w-full text-center">LOGIN / SIGN UP</a>
+              </div>
             </div>
           </ng-template>
+
+          <!-- Orders Link -->
+          <a routerLink="/orders" class="action-item action-link" routerLinkActive="active-action">
+            <span class="action-icon">📦</span>
+            <span class="action-label">Orders</span>
+          </a>
+
+          <!-- Admin Portal Link (if Admin) -->
+          <a *ngIf="authService.isAdmin()" routerLink="/admin" class="action-item action-link admin-pill-link" routerLinkActive="active-action">
+            <span class="action-icon">🛡️</span>
+            <span class="action-label">Admin</span>
+          </a>
+
+          <!-- Shopping Bag Link (Myntra Iconic Bag) -->
+          <a routerLink="/cart" class="action-item action-link bag-link" routerLinkActive="active-action">
+            <div class="bag-icon-wrapper">
+              <span class="action-icon">🛍️</span>
+              <span class="bag-badge" *ngIf="(cartService.cartCount$ | async) as count">{{ count }}</span>
+            </div>
+            <span class="action-label">Bag</span>
+          </a>
         </div>
 
-        <!-- Mobile Header Quick Actions (Cart + Hamburger Toggle) -->
+        <!-- Mobile Header Icons (Bag + Menu Hamburger) -->
         <div class="mobile-header-actions mobile-only">
-          <a routerLink="/cart" class="mobile-cart-icon" (click)="closeMobileMenu()">
-            🛒
-            <span class="cart-badge" *ngIf="(cartService.cartCount$ | async) as count">{{ count }}</span>
+          <a routerLink="/cart" class="mobile-bag-icon" (click)="closeMobileMenu()">
+            🛍️
+            <span class="bag-badge" *ngIf="(cartService.cartCount$ | async) as count">{{ count }}</span>
           </a>
 
           <button
@@ -87,40 +152,74 @@ import { CartService } from '../../../core/services/cart.service';
 
       <!-- Mobile Navigation Drawer -->
       <div class="mobile-menu-drawer mobile-only" [class.open]="isMobileMenuOpen">
+        <!-- Search bar inside mobile drawer -->
         <div class="mobile-search-box">
+          <span class="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search 58+ Indian products..."
             [(ngModel)]="searchKeyword"
             (keyup.enter)="onSearch()"
           />
-          <button (click)="onSearch()" aria-label="Search">🔍</button>
+          <button (click)="onSearch()" class="mobile-search-btn">Go</button>
         </div>
 
+        <!-- User Status Card in Drawer -->
+        <div class="mobile-user-card" *ngIf="authService.currentUser$ | async as user; else mobileGuestHeader">
+          <div class="mobile-user-avatar">{{ user.firstName[0] }}</div>
+          <div>
+            <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+            <span class="mobile-user-email">{{ user.email }}</span>
+          </div>
+        </div>
+        <ng-template #mobileGuestHeader>
+          <div class="mobile-guest-header">
+            <span>Welcome, Guest!</span>
+            <div class="mobile-guest-btns">
+              <a routerLink="/auth/login" class="btn btn-sm btn-outline-primary" (click)="closeMobileMenu()">Sign In</a>
+              <a routerLink="/auth/register" class="btn btn-sm btn-primary" (click)="closeMobileMenu()">Register</a>
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Categories & Navigation Links -->
         <div class="mobile-nav-links">
-          <a routerLink="/products" class="mobile-nav-link" routerLinkActive="active" (click)="closeMobileMenu()">
-            🛍️ All Products Catalog
+          <div class="mobile-section-title">SHOP BY CATEGORY</div>
+          <a routerLink="/products" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>🛍️</span> All Products (58 items)
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 1 }" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>🎧</span> Audio & Sound
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 2 }" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>⌚</span> Wearables & Smartwatches
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 3 }" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>💻</span> Computer & Gaming Gear
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 4 }" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>⚡</span> Mobile & Power Accessories
+          </a>
+          <a routerLink="/products" [queryParams]="{ categoryId: 5 }" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>🏠</span> Smart Home & IoT
           </a>
 
-          <a *ngIf="authService.isAdmin()" routerLink="/admin" class="mobile-nav-link admin" routerLinkActive="active" (click)="closeMobileMenu()">
-            🛡️ Admin Portal
+          <div class="mobile-section-title mt-4">MY ACCOUNT</div>
+          <a routerLink="/orders" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>📦</span> My Orders & Tracking
+          </a>
+          <a routerLink="/cart" class="mobile-nav-link" (click)="closeMobileMenu()">
+            <span>🛍️</span> Shopping Bag ({{ (cartService.cartCount$ | async) || 0 }})
+          </a>
+          <a *ngIf="authService.isAdmin()" routerLink="/admin" class="mobile-nav-link admin" (click)="closeMobileMenu()">
+            <span>🛡️</span> Admin Dashboard
           </a>
 
-          <ng-container *ngIf="authService.currentUser$ | async as user; else mobileGuestNav">
-            <a routerLink="/orders" class="mobile-nav-link" routerLinkActive="active" (click)="closeMobileMenu()">
-              📦 My Orders & Tracking ({{ user.firstName }})
-            </a>
-            <div class="mobile-auth-footer">
-              <button (click)="logout(); closeMobileMenu()" class="btn btn-outline btn-sm w-full">Sign Out</button>
-            </div>
-          </ng-container>
-
-          <ng-template #mobileGuestNav>
-            <div class="mobile-guest-buttons">
-              <a routerLink="/auth/login" class="btn btn-outline w-full text-center" (click)="closeMobileMenu()">Sign In</a>
-              <a routerLink="/auth/register" class="btn btn-primary w-full text-center" (click)="closeMobileMenu()">Register</a>
-            </div>
-          </ng-template>
+          <div *ngIf="authService.currentUser$ | async" class="mobile-logout-wrapper">
+            <button (click)="logout(); closeMobileMenu()" class="btn btn-outline btn-sm w-full">
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -131,321 +230,532 @@ import { CartService } from '../../../core/services/cart.service';
       top: 0;
       z-index: 1000;
       background: #ffffff;
+      box-shadow: 0 4px 16px rgba(40, 44, 63, 0.08);
       border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
+
+    /* Top Announcement Bar (Myntra Campaign Style) */
     .top-announcement {
-      background: #0f172a;
-      color: #94a3b8;
-      font-size: 0.725rem;
-      text-align: center;
-      padding: 6px 12px;
-      line-height: 1.4;
+      background: #282c3f;
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding: 6px 0;
+      letter-spacing: 0.02em;
     }
-    .top-announcement strong { color: #38bdf8; }
+
+    .announcement-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .announcement-pill {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.6875rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .announcement-text strong {
+      color: #ff905a;
+    }
+
+    .announcement-code {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .announcement-code strong {
+      color: #ff527b;
+    }
+
+    /* Main Navbar */
     .navbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 70px;
+      height: 74px;
       gap: 20px;
     }
+
+    /* Brand Logo */
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       text-decoration: none;
+      flex-shrink: 0;
     }
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      background: var(--primary-gradient);
       color: #ffffff;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(255, 63, 108, 0.35);
+      letter-spacing: -0.05em;
     }
-    .brand-name {
+
+    .brand-title {
       font-size: 1.35rem;
       font-weight: 800;
       color: var(--secondary);
       letter-spacing: -0.03em;
+      line-height: 1.1;
     }
-    .brand-name span { color: var(--primary); }
+
+    .brand-title span {
+      color: var(--primary);
+    }
+
+    .brand-tagline {
+      display: block;
+      font-size: 0.625rem;
+      font-weight: 800;
+      color: var(--accent-orange);
+      letter-spacing: 0.22em;
+    }
+
+    /* Myntra Category Links in Header */
+    .category-nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      height: 74px;
+    }
+
+    .cat-nav-link {
+      font-size: 0.8125rem;
+      font-weight: 800;
+      color: #282c3f;
+      letter-spacing: 0.04em;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .cat-nav-link:hover,
+    .cat-nav-link.active {
+      color: var(--primary);
+    }
+
+    .cat-nav-link.active::after,
+    .cat-nav-link:hover::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .hot-badge {
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.5625rem;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-left: 4px;
+      vertical-align: top;
+    }
+
+    /* Myntra Capsule Search Bar */
     .search-box {
       flex: 1;
       max-width: 480px;
       display: flex;
       align-items: center;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
+      background: #f5f5f6;
+      border: 1px solid transparent;
       border-radius: 9999px;
-      padding: 4px 6px 4px 16px;
+      padding: 0 16px;
+      height: 44px;
       transition: all 0.2s ease;
     }
+
     .search-box:focus-within {
       background: #ffffff;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 3px rgba(255, 63, 108, 0.12);
     }
+
+    .search-icon {
+      font-size: 0.95rem;
+      color: #94969f;
+      margin-right: 8px;
+    }
+
     .search-box input {
       flex: 1;
-      border: none;
       background: transparent;
+      border: none;
       outline: none;
-      font-size: 0.875rem;
+      font-size: 0.84rem;
       font-family: inherit;
       color: var(--text-primary);
     }
-    .search-box button {
-      background: #ffffff;
+
+    .clear-search-btn {
+      background: none;
       border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      font-size: 0.75rem;
+      color: #94969f;
       cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 50%;
+    }
+
+    /* Right Action Items (Icon + Label underneath) */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .action-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .action-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: #282c3f;
+      transition: color 0.2s ease;
+    }
+
+    .action-link:hover,
+    .active-action {
+      color: var(--primary) !important;
+    }
+
+    .action-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .action-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .action-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: var(--shadow-sm);
     }
-    .nav-actions {
+
+    .bag-icon-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .bag-badge {
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      box-shadow: 0 2px 6px rgba(255, 63, 108, 0.4);
+    }
+
+    /* Profile Dropdown Hover Card */
+    .profile-dropdown-wrapper {
+      position: relative;
+      padding: 10px 0;
+    }
+
+    .profile-dropdown-card {
+      position: absolute;
+      top: 100%;
+      right: -30px;
+      width: 250px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(40, 44, 63, 0.15);
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      display: none;
+      z-index: 1001;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
+    .profile-dropdown-wrapper:hover .profile-dropdown-card {
+      display: block;
+    }
+
+    .user-greeting-box {
+      margin-bottom: 8px;
+    }
+
+    .user-greeting-box strong {
+      display: block;
+      color: var(--secondary);
+      font-size: 0.875rem;
+    }
+
+    .user-email-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 10px 0;
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 8px 0;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #282c3f;
+    }
+
+    .dropdown-link:hover {
+      color: var(--primary);
+    }
+
+    .admin-link {
+      color: #8b5cf6;
+    }
+
+    .dropdown-logout-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .guest-card {
+      text-align: center;
+    }
+
+    .guest-msg {
+      font-size: 0.8125rem;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Mobile Header Icons */
+    .mobile-header-actions {
       display: flex;
       align-items: center;
       gap: 16px;
     }
-    .nav-link {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.15s ease;
-    }
-    .nav-link:hover, .nav-link.active { color: var(--primary); }
-    .admin-pill {
-      font-size: 0.8rem;
-      font-weight: 700;
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fde68a;
-      padding: 5px 12px;
-      border-radius: 9999px;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .admin-pill:hover { background: #fde68a; }
-    .cart-btn {
+
+    .mobile-bag-icon {
+      font-size: 1.35rem;
       position: relative;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      border-radius: var(--radius-md);
-      transition: background 0.15s ease;
-    }
-    .cart-btn:hover { background: #f1f5f9; }
-    .cart-badge {
-      background: var(--primary);
-      color: #ffffff;
-      font-size: 0.7rem;
-      font-weight: 800;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .user-greeting {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: var(--text-primary);
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #e0e7ff;
-      color: #3730a3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .btn-logout {
-      background: none;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 4px 8px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-    .btn-logout:hover { background: #f1f5f9; color: var(--danger); }
-    .auth-buttons {
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    /* Mobile Header Controls */
-    .mobile-header-actions {
-      display: none;
-      align-items: center;
-      gap: 14px;
-    }
-    .mobile-cart-icon {
-      position: relative;
-      font-size: 1.4rem;
-      text-decoration: none;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-    }
-    .mobile-cart-icon .cart-badge {
-      position: absolute;
-      top: -6px;
-      right: -10px;
-      font-size: 0.65rem;
-      min-width: 18px;
-      height: 18px;
-    }
     .hamburger-btn {
       background: none;
       border: none;
-      cursor: pointer;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       gap: 5px;
-      width: 36px;
-      height: 36px;
-      padding: 4px;
-      border-radius: 6px;
+      cursor: pointer;
+      padding: 6px;
     }
+
     .hamburger-bar {
-      width: 100%;
+      width: 22px;
       height: 2.5px;
       background-color: var(--secondary);
       border-radius: 2px;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
     }
+
     .hamburger-bar.open:nth-child(1) {
       transform: translateY(7.5px) rotate(45deg);
     }
+
     .hamburger-bar.open:nth-child(2) {
       opacity: 0;
     }
+
     .hamburger-bar.open:nth-child(3) {
       transform: translateY(-7.5px) rotate(-45deg);
     }
 
     /* Mobile Drawer */
     .mobile-menu-drawer {
-      display: none;
       background: #ffffff;
       border-top: 1px solid var(--border-color);
-      padding: 16px 20px 24px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-      animation: fadeIn 0.2s ease-out;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-in-out;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
     }
+
     .mobile-menu-drawer.open {
-      display: block;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 16px 16px 28px;
     }
+
     .mobile-search-box {
       display: flex;
       align-items: center;
-      background: #f1f5f9;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 4px 8px 4px 12px;
+      background: #f5f5f6;
+      border-radius: 8px;
+      padding: 0 12px;
       margin-bottom: 16px;
     }
+
     .mobile-search-box input {
       flex: 1;
+      padding: 10px 6px;
       border: none;
       background: transparent;
       outline: none;
-      font-size: 0.9rem;
-      padding: 6px 0;
+      font-size: 0.875rem;
     }
-    .mobile-search-box button {
-      background: none;
+
+    .mobile-search-btn {
+      background: var(--primary);
+      color: #ffffff;
       border: none;
-      font-size: 1rem;
-      cursor: pointer;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 700;
+      font-size: 0.75rem;
     }
-    .mobile-nav-links {
+
+    .mobile-user-card {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: center;
+      gap: 12px;
+      background: var(--primary-light);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
     }
+
+    .mobile-user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .mobile-user-email {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .mobile-guest-header {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mobile-guest-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mobile-section-title {
+      font-size: 0.6875rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
     .mobile-nav-link {
-      padding: 10px 12px;
-      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      font-size: 0.875rem;
       font-weight: 600;
       color: var(--text-primary);
-      text-decoration: none;
-      font-size: 0.95rem;
+      border-radius: 8px;
       transition: background 0.15s ease;
     }
-    .mobile-nav-link:hover, .mobile-nav-link.active {
-      background: var(--primary-light);
+
+    .mobile-nav-link:hover {
+      background: var(--bg-main);
       color: var(--primary);
     }
-    .mobile-nav-link.admin {
-      background: #fffbeb;
-      color: #92400e;
-      border: 1px solid #fde68a;
-    }
-    .mobile-guest-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
+
+    .mobile-logout-wrapper {
+      margin-top: 16px;
       padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
+      border-top: 1px solid var(--border-color);
     }
-    .mobile-auth-footer {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #f1f5f9;
+
+    /* Media Queries */
+    @media (min-width: 992px) {
+      .mobile-only { display: none !important; }
     }
-    .w-full { width: 100%; }
-    .text-center { text-align: center; }
 
-    /* Responsive Breakpoints */
-    .mobile-only { display: none; }
-    .desktop-only { display: flex; }
-
-    @media (max-width: 900px) {
+    @media (max-width: 991px) {
       .desktop-only { display: none !important; }
-      .mobile-only { display: flex; }
-      .mobile-menu-drawer.open { display: block; }
-      .navbar { height: 60px; }
-      .brand-icon { width: 34px; height: 34px; font-size: 1rem; }
-      .brand-name { font-size: 1.2rem; }
+      .navbar { height: 64px; }
+      .brand-badge { width: 36px; height: 36px; font-size: 1.05rem; }
+      .brand-title { font-size: 1.15rem; }
     }
   `]
 })
@@ -457,38 +767,37 @@ export class NavbarComponent implements OnInit {
   searchKeyword = '';
   isMobileMenuOpen = false;
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-      this.cartService.loadCart().subscribe({ error: () => {} });
+      this.cartService.loadCart().subscribe();
     }
 
-    // Auto-close mobile menu on any navigation
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.closeMobileMenu();
-    });
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.closeMobileMenu();
+      });
   }
 
-  toggleMobileMenu() {
+  onSearch(): void {
+    if (this.searchKeyword.trim()) {
+      this.router.navigate(['/products'], {
+        queryParams: { keyword: this.searchKeyword.trim() }
+      });
+      this.closeMobileMenu();
+    }
+  }
+
+  toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
-  closeMobileMenu() {
+  closeMobileMenu(): void {
     this.isMobileMenuOpen = false;
   }
 
-  onSearch() {
-    if (this.searchKeyword.trim()) {
-      this.router.navigate(['/products'], { queryParams: { keyword: this.searchKeyword.trim() } });
-      this.closeMobileMenu();
-    } else {
-      this.router.navigate(['/products']);
-      this.closeMobileMenu();
-    }
-  }
-
-  logout() {
+  logout(): void {
     this.authService.logout();
+    this.closeMobileMenu();
   }
 }

@@ -13,302 +13,544 @@ import { Cart } from '../../core/models/cart.model';
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule],
   template: `
-    <div class="container py-8">
-      <h1 class="page-title mb-6">Checkout & Order Placement</h1>
+    <div class="checkout-page">
+      <!-- Myntra Stepper Header Bar -->
+      <div class="checkout-stepper-bar">
+        <div class="container stepper-container">
+          <a routerLink="/cart" class="step-item completed">
+            <span class="step-num">✓</span>
+            <span class="step-text">BAG</span>
+          </a>
+          <div class="step-line active"></div>
+          <div class="step-item active">
+            <span class="step-num">2</span>
+            <span class="step-text">ADDRESS</span>
+          </div>
+          <div class="step-line active"></div>
+          <div class="step-item active">
+            <span class="step-num">3</span>
+            <span class="step-text">PAYMENT</span>
+          </div>
+        </div>
+      </div>
 
-      <div *ngIf="cart && cart.items.length > 0; else noItems" class="checkout-layout">
-        <!-- Main Form (Shipping & Payment) -->
-        <div class="checkout-forms">
-          <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
-            <!-- Section 1: Shipping Address -->
-            <div class="card p-6 mb-6">
-              <div class="section-title-row">
-                <span class="step-num">1</span>
-                <h2>Shipping Destination</h2>
-              </div>
+      <div class="container py-8">
+        <div *ngIf="cart && cart.items.length > 0; else noItems" class="checkout-layout">
+          <!-- Forms Column -->
+          <div class="checkout-forms">
+            <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+              <!-- Section 1: Indian Delivery Address -->
+              <div class="card p-6 mb-6 address-card">
+                <div class="section-title-row">
+                  <span class="step-badge">1</span>
+                  <div>
+                    <h2 class="section-title">DELIVERY ADDRESS</h2>
+                    <p class="section-sub">Where should we deliver your order?</p>
+                  </div>
+                </div>
 
-              <div class="form-row">
-                <div class="form-group flex-1">
-                  <label class="form-label">Full Street Address *</label>
-                  <input type="text" formControlName="street" class="form-control" placeholder="100 Enterprise Way, Suite 400" />
+                <div class="quick-preset-btns mb-4">
+                  <span class="preset-label">Quick Fill:</span>
+                  <button type="button" (click)="fillPreset('bengaluru')" class="preset-chip">📍 Bengaluru</button>
+                  <button type="button" (click)="fillPreset('mumbai')" class="preset-chip">📍 Mumbai</button>
+                  <button type="button" (click)="fillPreset('delhi')" class="preset-chip">📍 Delhi NCR</button>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Flat, House no., Building, Street *</label>
+                  <input
+                    type="text"
+                    formControlName="street"
+                    class="form-control"
+                    placeholder="e.g. 402 Green Glen Layout, Bellandur"
+                  />
                   <span class="form-error" *ngIf="checkoutForm.get('street')?.invalid && checkoutForm.get('street')?.touched">
                     Street address is required.
                   </span>
                 </div>
-              </div>
 
-              <div class="form-grid-3">
-                <div class="form-group">
-                  <label class="form-label">City *</label>
-                  <input type="text" formControlName="city" class="form-control" placeholder="San Francisco" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">State / Province *</label>
-                  <input type="text" formControlName="state" class="form-control" placeholder="CA" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Postal Code *</label>
-                  <input type="text" formControlName="zipCode" class="form-control" placeholder="94105" />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Country *</label>
-                <input type="text" formControlName="country" class="form-control" placeholder="United States" />
-              </div>
-            </div>
-
-            <!-- Section 2: Payment Simulation -->
-            <div class="card p-6 mb-6">
-              <div class="section-title-row">
-                <span class="step-num">2</span>
-                <h2>Simulated Payment Gateway</h2>
-              </div>
-              <p class="section-desc">
-                Select a simulated payment behavior scenario to test distributed Saga confirmation or compensating inventory rollback.
-              </p>
-
-              <!-- Payment Simulation Scenario Radio Cards -->
-              <div class="scenario-cards mb-6">
-                <label class="scenario-card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_SUCCESS'">
-                  <input type="radio" formControlName="paymentToken" value="CARD_SUCCESS" />
-                  <div class="scenario-info">
-                    <div class="scenario-title">
-                      <span>🟢 Standard Approval</span>
-                      <span class="badge badge-success">Saga Complete</span>
-                    </div>
-                    <p>Card charge succeeds. Stock confirmed and deducted, order marked CONFIRMED.</p>
-                  </div>
-                </label>
-
-                <label class="scenario-card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_DECLINED'">
-                  <input type="radio" formControlName="paymentToken" value="CARD_DECLINED" />
-                  <div class="scenario-info">
-                    <div class="scenario-title">
-                      <span>🔴 Card Declined</span>
-                      <span class="badge badge-danger">Rollback Demo</span>
-                    </div>
-                    <p>Card fails at payment gateway. Compensating action releases reserved stock automatically.</p>
-                  </div>
-                </label>
-
-                <label class="scenario-card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_INSUFFICIENT_FUNDS'">
-                  <input type="radio" formControlName="paymentToken" value="CARD_INSUFFICIENT_FUNDS" />
-                  <div class="scenario-info">
-                    <div class="scenario-title">
-                      <span>🟡 Insufficient Funds</span>
-                      <span class="badge badge-warning">Rollback Demo</span>
-                    </div>
-                    <p>Payment rejected due to balance. Order marked PAYMENT_FAILED, inventory restored.</p>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Simulated Card Inputs -->
-              <div class="simulated-card-inputs">
-                <div class="form-group">
-                  <label class="form-label">Simulated Card Number</label>
-                  <input type="text" class="form-control" value="•••• •••• •••• 4242" readonly />
-                </div>
-                <div class="form-grid-2">
+                <div class="form-grid-3">
                   <div class="form-group">
-                    <label class="form-label">Expiry</label>
-                    <input type="text" class="form-control" value="12 / 28" readonly />
+                    <label class="form-label">City *</label>
+                    <input type="text" formControlName="city" class="form-control" placeholder="Bengaluru" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">CVV Security Code</label>
-                    <input type="text" class="form-control" value="888" readonly />
+                    <label class="form-label">State *</label>
+                    <input type="text" formControlName="state" class="form-control" placeholder="Karnataka" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Pincode *</label>
+                    <input type="text" formControlName="zipCode" class="form-control" placeholder="560103" />
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              [disabled]="checkoutForm.invalid || isSubmitting"
-              class="btn btn-primary btn-lg w-full submit-order-btn"
-            >
-              <span *ngIf="!isSubmitting">⚡ Place Order & Process Saga Checkout (\${{ getEstimatedTotal() | number:'1.2-2' }})</span>
-              <span *ngIf="isSubmitting">Orchestrating Saga (Stock ➔ Payment ➔ Confirmation)...</span>
-            </button>
-          </form>
-        </div>
-
-        <!-- Order Summary Sidebar -->
-        <aside class="checkout-summary">
-          <div class="card p-6">
-            <h3 class="summary-heading">Order Breakdown</h3>
-
-            <div class="summary-items">
-              <div *ngFor="let item of cart.items" class="summary-item">
-                <img [src]="item.imageUrl" [alt]="item.productName" class="item-thumb" />
-                <div class="item-text">
-                  <span class="name">{{ item.productName }}</span>
-                  <span class="qty">Qty: {{ item.quantity }} × ₹{{ item.unitPrice | number:'1.2-2' }}</span>
+                <div class="form-group">
+                  <label class="form-label">Country</label>
+                  <input type="text" formControlName="country" class="form-control" readonly />
                 </div>
-                <span class="item-price">₹{{ item.subtotal | number:'1.2-2' }}</span>
               </div>
-            </div>
 
-            <div class="summary-calc mt-4">
-              <div class="calc-row">
-                <span>Subtotal</span>
-                <span>₹{{ cart.totalAmount | number:'1.2-2' }}</span>
+              <!-- Section 2: Simulated Payment Gateway Scenarios -->
+              <div class="card p-6 mb-6 payment-card">
+                <div class="section-title-row">
+                  <span class="step-badge">2</span>
+                  <div>
+                    <h2 class="section-title">PAYMENT METHOD SIMULATION</h2>
+                    <p class="section-sub">Choose a distributed transaction scenario to test Saga orchestration</p>
+                  </div>
+                </div>
+
+                <!-- Scenario Radio Cards -->
+                <div class="scenario-cards-list mt-4">
+                  <label class="scenario-option card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_SUCCESS'">
+                    <input type="radio" formControlName="paymentToken" value="CARD_SUCCESS" />
+                    <div class="scenario-body">
+                      <div class="scenario-title-line">
+                        <span class="scenario-name">🟢 Instant Approval (UPI & Cards)</span>
+                        <span class="badge badge-success">Saga Complete</span>
+                      </div>
+                      <p class="scenario-desc">
+                        Simulates successful charge. Inventory locks are permanently confirmed, and order status transitions to <strong>CONFIRMED</strong>.
+                      </p>
+                    </div>
+                  </label>
+
+                  <label class="scenario-option card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_DECLINED'">
+                    <input type="radio" formControlName="paymentToken" value="CARD_DECLINED" />
+                    <div class="scenario-body">
+                      <div class="scenario-title-line">
+                        <span class="scenario-name">🔴 Card Declined / Gateway Error</span>
+                        <span class="badge badge-danger">Rollback Demo</span>
+                      </div>
+                      <p class="scenario-desc">
+                        Simulates declined card. Order Saga triggers compensating transaction to release reserved stock.
+                      </p>
+                    </div>
+                  </label>
+
+                  <label class="scenario-option card" [class.selected]="checkoutForm.get('paymentToken')?.value === 'CARD_INSUFFICIENT_FUNDS'">
+                    <input type="radio" formControlName="paymentToken" value="CARD_INSUFFICIENT_FUNDS" />
+                    <div class="scenario-body">
+                      <div class="scenario-title-line">
+                        <span class="scenario-name">🟡 Insufficient Balance</span>
+                        <span class="badge badge-warning">Rollback Demo</span>
+                      </div>
+                      <p class="scenario-desc">
+                        Simulates bank rejection due to insufficient funds. Demonstrates idempotent failure handling.
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
-              <div class="calc-row">
-                <span>GST (18%)</span>
-                <span>₹{{ getEstimatedTax() | number:'1.2-2' }}</span>
-              </div>
-              <div class="calc-row">
-                <span>Shipping</span>
-                <span *ngIf="getShippingCost() === 0" class="text-success font-bold">FREE</span>
-                <span *ngIf="getShippingCost() > 0">₹{{ getShippingCost() | number:'1.2-2' }}</span>
-              </div>
-              <div class="calc-divider"></div>
-              <div class="calc-row total">
-                <span>Total Amount</span>
-                <span class="price">₹{{ getEstimatedTotal() | number:'1.2-2' }}</span>
-              </div>
-            </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                [disabled]="checkoutForm.invalid || loading"
+                class="btn btn-primary btn-lg w-full pay-now-btn"
+              >
+                <span *ngIf="!loading">PAY & COMPLETE ORDER (₹{{ getFinalTotal() | number:'1.2-2' }}) →</span>
+                <span *ngIf="loading">Executing Distributed Saga (Reserve → Charge → Confirm)...</span>
+              </button>
+            </form>
           </div>
-        </aside>
-      </div>
 
-      <ng-template #noItems>
-        <div class="card p-8 text-center">
-          <h2>No items to checkout</h2>
-          <p class="mt-2 text-muted">Your shopping cart is currently empty.</p>
-          <a routerLink="/products" class="btn btn-primary mt-4">Browse Catalog</a>
+          <!-- Right Sidebar: Order Summary & Trust -->
+          <aside class="checkout-summary-col">
+            <div class="card p-5 summary-card">
+              <h3 class="summary-title">ORDER SUMMARY ({{ cart.totalItems }} Items)</h3>
+
+              <!-- Mini Item Thumbnails -->
+              <div class="mini-items-strip">
+                <div *ngFor="let item of cart.items" class="mini-item-box">
+                  <img [src]="item.imageUrl" [alt]="item.productName" class="mini-img" />
+                  <span class="mini-qty-badge">{{ item.quantity }}</span>
+                </div>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="price-rows">
+                <div class="price-row">
+                  <span>Bag Subtotal</span>
+                  <span>₹{{ cart.totalAmount | number:'1.2-2' }}</span>
+                </div>
+                <div class="price-row">
+                  <span>Estimated GST (18%)</span>
+                  <span>₹{{ getEstimatedTax() | number:'1.2-2' }}</span>
+                </div>
+                <div class="price-row">
+                  <span>Shipping Fee</span>
+                  <span *ngIf="getShippingCost() === 0" class="text-success font-bold">FREE</span>
+                  <span *ngIf="getShippingCost() > 0">₹{{ getShippingCost() | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="price-row total-row">
+                  <span>Total Payable</span>
+                  <span class="grand-total">₹{{ getFinalTotal() | number:'1.2-2' }}</span>
+                </div>
+              </div>
+
+              <!-- Trust Badges -->
+              <div class="checkout-trust-box mt-4">
+                <div class="trust-line">
+                  <span>🔒</span>
+                  <span>256-Bit SSL Encrypted & PCI-DSS Tokenized</span>
+                </div>
+                <div class="trust-line">
+                  <span>⚡</span>
+                  <span>Spring Cloud Distributed Transaction</span>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
-      </ng-template>
+
+        <ng-template #noItems>
+          <div class="empty-checkout card text-center p-8">
+            <div class="empty-icon">🛍️</div>
+            <h2>Your bag is empty!</h2>
+            <p>Please add products to your bag before proceeding to checkout.</p>
+            <a routerLink="/products" class="btn btn-primary mt-4">Browse Catalog</a>
+          </div>
+        </ng-template>
+      </div>
     </div>
   `,
   styles: [`
-    .py-8 { padding-top: 2rem; padding-bottom: 3rem; }
-    .page-title { font-size: 1.85rem; color: var(--secondary); }
+    .checkout-page {
+      background: var(--bg-main);
+      min-height: calc(100vh - 140px);
+    }
+
+    /* Stepper */
+    .checkout-stepper-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 0;
+    }
+
+    .stepper-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      max-width: 500px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .step-item.active {
+      color: var(--primary);
+    }
+
+    .step-item.completed {
+      color: #03a685;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    .step-item.active .step-num {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .step-item.completed .step-num {
+      background: #03a685;
+      color: #ffffff;
+      border-color: #03a685;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .step-line.active {
+      background: #03a685;
+    }
+
+    .py-8 {
+      padding: 2rem 0 4rem;
+    }
+
     .checkout-layout {
       display: grid;
       grid-template-columns: 1fr 380px;
-      gap: 30px;
-      align-items: flex-start;
+      gap: 32px;
+      align-items: start;
     }
-    .p-6 { padding: 1.5rem; }
+
     .section-title-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
     }
-    .step-num {
+
+    .step-badge {
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--secondary);
       color: #ffffff;
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.8125rem;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .section-title-row h2 { font-size: 1.2rem; }
-    .section-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
-    
-    .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    
-    .scenario-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .scenario-card {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 14px 16px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      background: #ffffff;
-    }
-    .scenario-card:hover { border-color: var(--primary); background: #f8fafc; }
-    .scenario-card.selected {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      box-shadow: 0 0 0 1px var(--primary);
-    }
-    .scenario-info { flex: 1; }
-    .scenario-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-    .scenario-info p { font-size: 0.775rem; color: var(--text-secondary); margin: 0; }
-    
-    .simulated-card-inputs {
-      background: #f8fafc;
-      padding: 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-    }
-    .submit-order-btn {
-      height: 52px;
-      font-size: 1.05rem;
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: 0.04em;
     }
 
-    .summary-heading { font-size: 1.15rem; margin-bottom: 16px; }
-    .summary-items {
+    .section-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Quick Fill Presets */
+    .quick-preset-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .preset-chip {
+      background: #f5f5f6;
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.725rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--secondary);
+      transition: all 0.2s ease;
+    }
+
+    .preset-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+
+    /* Payment Scenarios */
+    .scenario-cards-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 280px;
-      overflow-y: auto;
     }
-    .summary-item {
+
+    .scenario-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1.5px solid var(--border-color);
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .scenario-option:hover {
+      border-color: #cbd5e1;
+    }
+
+    .scenario-option.selected {
+      border-color: var(--primary);
+      background: #fffbfa;
+      box-shadow: 0 4px 12px rgba(255, 63, 108, 0.1);
+    }
+
+    .scenario-option input {
+      margin-top: 3px;
+      accent-color: var(--primary);
+    }
+
+    .scenario-body {
+      flex: 1;
+    }
+
+    .scenario-title-line {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-    }
-    .item-thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
-    .item-text { flex: 1; }
-    .item-text .name { font-weight: 600; display: block; }
-    .item-text .qty { font-size: 0.75rem; color: var(--text-muted); }
-    .item-price { font-weight: 700; }
-    
-    .calc-row {
-      display: flex;
       justify-content: space-between;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
-    .calc-divider { height: 1px; background: var(--border-color); margin: 10px 0; }
-    .calc-row.total {
-      font-size: 1.15rem;
+
+    .scenario-name {
+      font-size: 0.875rem;
       font-weight: 800;
       color: var(--secondary);
     }
-    .calc-row.total .price { color: var(--primary); font-size: 1.35rem; }
 
-    @media (max-width: 900px) {
-      .checkout-layout { grid-template-columns: 1fr; gap: 24px; }
-      .form-grid-3 { grid-template-columns: 1fr; }
+    .scenario-desc {
+      font-size: 0.775rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin: 0;
     }
 
-    @media (max-width: 600px) {
-      .card.p-8 { padding: 1.25rem; }
-      .card.p-6 { padding: 1rem; }
-      .scenario-card { padding: 12px; }
-      .scenario-title { flex-direction: column; align-items: flex-start; gap: 4px; }
-      .submit-order-btn { height: 48px; font-size: 0.95rem; }
-      .calc-row.total .price { font-size: 1.2rem; }
+    .pay-now-btn {
+      height: 52px;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* Right Summary Card */
+    .summary-card {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+    }
+
+    .summary-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .mini-items-strip {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .mini-item-box {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .mini-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mini-qty-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.75);
+      color: #ffffff;
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-top-left-radius: 4px;
+      font-weight: 800;
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 12px 0;
+    }
+
+    .price-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    .text-success {
+      color: #03a685 !important;
+      font-weight: 600;
+    }
+
+    .total-row {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--secondary);
+    }
+
+    .grand-total {
+      font-size: 1.25rem;
+      color: var(--secondary);
+    }
+
+    .checkout-trust-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.725rem;
+      color: var(--text-muted);
+    }
+
+    .trust-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-checkout {
+      max-width: 440px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 991px) {
+      .checkout-layout {
+        grid-template-columns: 1fr;
+      }
     }
   `]
 })
@@ -321,74 +563,96 @@ export class CheckoutComponent implements OnInit {
   private router = inject(Router);
 
   cart: Cart | null = null;
-  isSubmitting = false;
+  loading: boolean = false;
 
   checkoutForm: FormGroup = this.fb.group({
-    street: ['100 Tech Park, Whitefield', Validators.required],
-    city: ['Bengaluru', Validators.required],
-    state: ['Karnataka', Validators.required],
-    zipCode: ['560066', Validators.required],
-    country: ['India', Validators.required],
-    paymentToken: ['CARD_SUCCESS', Validators.required]
+    street: ['Flat 402, Green Glen Layout, Bellandur', [Validators.required]],
+    city: ['Bengaluru', [Validators.required]],
+    state: ['Karnataka', [Validators.required]],
+    zipCode: ['560103', [Validators.required]],
+    country: ['India', [Validators.required]],
+    paymentToken: ['CARD_SUCCESS', [Validators.required]]
   });
 
-  ngOnInit() {
+  ngOnInit(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/checkout' } });
+      return;
+    }
+
     this.cartService.cart$.subscribe(cart => {
       this.cart = cart;
     });
 
-    this.cartService.loadCart().subscribe({
-      next: res => { if (res.success) this.cart = res.data; }
-    });
+    this.cartService.loadCart().subscribe();
+  }
 
-    const user = this.authService.getCurrentUser();
-    if (user && user.street) {
+  fillPreset(city: string): void {
+    if (city === 'bengaluru') {
       this.checkoutForm.patchValue({
-        street: user.street,
-        city: user.city,
-        state: user.state,
-        zipCode: user.zipCode,
-        country: user.country
+        street: 'Flat 402, Green Glen Layout, Bellandur',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        zipCode: '560103',
+        country: 'India'
+      });
+    } else if (city === 'mumbai') {
+      this.checkoutForm.patchValue({
+        street: '14, Bandra West, Near Linking Road',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        zipCode: '400050',
+        country: 'India'
+      });
+    } else if (city === 'delhi') {
+      this.checkoutForm.patchValue({
+        street: 'Tower B, Cyber City, DLF Phase 2',
+        city: 'Gurugram',
+        state: 'Haryana',
+        zipCode: '122002',
+        country: 'India'
       });
     }
+    this.notificationService.success(`Address updated to ${city.toUpperCase()}`);
   }
 
   getEstimatedTax(): number {
-    return this.cart ? +(this.cart.totalAmount * 0.18).toFixed(2) : 0;
+    return this.cart ? Math.round(this.cart.totalAmount * 0.18) : 0;
   }
 
   getShippingCost(): number {
-    if (!this.cart) return 0;
-    return this.cart.totalAmount >= 999 ? 0 : 99.00;
+    if (!this.cart || this.cart.totalAmount === 0) return 0;
+    return this.cart.totalAmount >= 999 ? 0 : 99;
   }
 
-  getEstimatedTotal(): number {
+  getFinalTotal(): number {
     if (!this.cart) return 0;
-    return +(this.cart.totalAmount + this.getEstimatedTax() + this.getShippingCost()).toFixed(2);
+    return this.cart.totalAmount + this.getEstimatedTax() + this.getShippingCost();
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.checkoutForm.invalid || !this.cart) return;
 
-    this.isSubmitting = true;
+    this.loading = true;
     const formVal = this.checkoutForm.value;
-    const fullAddress = `${formVal.street}, ${formVal.city}, ${formVal.state} ${formVal.zipCode}, ${formVal.country}`;
+    const fullShippingAddress = `${formVal.street}, ${formVal.city}, ${formVal.state} - ${formVal.zipCode}, ${formVal.country}`;
 
     this.orderService.checkout({
-      shippingAddress: fullAddress,
-      paymentMethod: 'SIMULATED_GATEWAY',
+      shippingAddress: fullShippingAddress,
+      paymentMethod: 'CREDIT_CARD',
       paymentToken: formVal.paymentToken
     }).subscribe({
       next: res => {
-        this.isSubmitting = false;
+        this.loading = false;
         if (res.success && res.data) {
           this.notificationService.success('Order placed and confirmed successfully!');
           this.cartService.loadCart().subscribe();
           this.router.navigate(['/orders', res.data.orderNumber]);
         }
       },
-      error: () => {
-        this.isSubmitting = false;
+      error: (err) => {
+        this.loading = false;
+        // In case of simulated decline, the error interceptor will notify
       }
     });
   }

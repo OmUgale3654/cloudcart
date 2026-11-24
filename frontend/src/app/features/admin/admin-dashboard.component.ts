@@ -17,95 +17,133 @@ import { ApiResponse } from '../../core/models/api.model';
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
   template: `
     <div class="container py-8">
-      <div class="admin-header mb-6">
-        <div>
-          <span class="badge badge-warning mb-2">Management Console</span>
-          <h1 class="page-title">Executive Operations Dashboard</h1>
+      <!-- Admin Header Banner -->
+      <div class="admin-header-card mb-6">
+        <div class="admin-header-left">
+          <div class="console-pill">
+            <span class="pulse-dot"></span>
+            <span>CLOUDCART ENTERPRISE • LIVE OPERATIONS</span>
+          </div>
+          <h1 class="console-title">Executive Operations Console</h1>
+          <p class="console-subtitle">
+            Orchestrate distributed saga orders, catalog SKU lifecycle, and row-level inventory concurrency.
+          </p>
         </div>
-        <div class="header-actions">
-          <button (click)="openProductModal()" class="btn btn-primary">+ Create New Product</button>
+        <div class="admin-header-right">
+          <button (click)="openProductModal()" class="btn-create-product">
+            <span>✨</span> Add New Product
+          </button>
         </div>
       </div>
 
       <!-- KPI Metrics Cards -->
       <div class="metrics-grid mb-6">
-        <div class="card metric-card p-6">
-          <div class="metric-top">
-            <span class="metric-label">Total Revenue</span>
-            <span class="metric-icon">💰</span>
+        <div class="kpi-card revenue-kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Net Revenue</span>
+            <span class="kpi-icon-wrap bg-pink-light">💰</span>
           </div>
-          <div class="metric-value">₹{{ totalRevenue | number:'1.2-2' }}</div>
-          <span class="metric-sub text-success">From {{ totalOrdersCount }} customer orders</span>
+          <div class="kpi-val">₹{{ totalRevenue | number:'1.2-2' }}</div>
+          <div class="kpi-footer">
+            <span class="kpi-trend trend-up">▲ Active</span>
+            <span class="kpi-hint">From {{ totalOrdersCount }} customer orders</span>
+          </div>
         </div>
 
-        <div class="card metric-card p-6">
-          <div class="metric-top">
-            <span class="metric-label">Total Orders</span>
-            <span class="metric-icon">📦</span>
+        <div class="kpi-card orders-kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Orders</span>
+            <span class="kpi-icon-wrap bg-blue-light">📦</span>
           </div>
-          <div class="metric-value">{{ totalOrdersCount }}</div>
-          <span class="metric-sub text-muted">Across all microservices</span>
+          <div class="kpi-val">{{ totalOrdersCount }}</div>
+          <div class="kpi-footer">
+            <span class="kpi-trend trend-neutral">● Saga Tracked</span>
+            <span class="kpi-hint">Across distributed services</span>
+          </div>
         </div>
 
-        <div class="card metric-card p-6">
-          <div class="metric-top">
-            <span class="metric-label">Catalog Products</span>
-            <span class="metric-icon">🛍️</span>
+        <div class="kpi-card catalog-kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Active Catalog SKUs</span>
+            <span class="kpi-icon-wrap bg-purple-light">🛍️</span>
           </div>
-          <div class="metric-value">{{ products.length }}</div>
-          <span class="metric-sub text-muted">In {{ categories.length }} categories</span>
+          <div class="kpi-val">{{ products.length }}</div>
+          <div class="kpi-footer">
+            <span class="kpi-trend trend-up">✓ In-Stock</span>
+            <span class="kpi-hint">{{ categories.length }} Categories mapped</span>
+          </div>
         </div>
 
-        <div class="card metric-card p-6">
-          <div class="metric-top">
-            <span class="metric-label">Low Stock Alerts</span>
-            <span class="metric-icon">⚠️</span>
+        <div class="kpi-card stock-kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Low Stock Alerts</span>
+            <span class="kpi-icon-wrap bg-amber-light">⚠️</span>
           </div>
-          <div class="metric-value text-warning">{{ lowStockCount }}</div>
-          <span class="metric-sub text-muted">SKUs below 20 units</span>
+          <div class="kpi-val" [class.val-alert]="lowStockCount > 0">{{ lowStockCount }}</div>
+          <div class="kpi-footer">
+            <span class="kpi-trend" [ngClass]="lowStockCount > 0 ? 'trend-alert' : 'trend-up'">
+              {{ lowStockCount > 0 ? 'Action Needed' : 'Nominal' }}
+            </span>
+            <span class="kpi-hint">SKUs below 20 units</span>
+          </div>
         </div>
       </div>
 
-      <!-- Admin Tab Switcher -->
-      <div class="tab-bar mb-6">
-        <button [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'" class="tab-btn">
-          📋 Order Fulfillment ({{ orders.length }})
+      <!-- Navigation Tabs -->
+      <div class="console-tabs-wrap mb-6">
+        <button [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'" class="console-tab">
+          <span class="tab-icon">📋</span>
+          <span>Order Fulfillment</span>
+          <span class="tab-badge">{{ orders.length }}</span>
         </button>
-        <button [class.active]="activeTab === 'products'" (click)="activeTab = 'products'" class="tab-btn">
-          📦 Product Catalog ({{ products.length }})
+        <button [class.active]="activeTab === 'products'" (click)="activeTab = 'products'" class="console-tab">
+          <span class="tab-icon">📦</span>
+          <span>Product Catalog</span>
+          <span class="tab-badge">{{ products.length }}</span>
         </button>
-        <button [class.active]="activeTab === 'inventory'" (click)="activeTab = 'inventory'" class="tab-btn">
-          📊 Inventory & Stock Levels
+        <button [class.active]="activeTab === 'inventory'" (click)="activeTab = 'inventory'" class="console-tab">
+          <span class="tab-icon">📊</span>
+          <span>Inventory & Concurrency</span>
         </button>
       </div>
 
-      <!-- Tab 1: Orders Management -->
-      <div *ngIf="activeTab === 'orders'" class="card p-6">
-        <div class="card-header-line mb-4">
-          <h2>Order Fulfillment & Status Lifecycle</h2>
-          <span class="text-muted text-sm">Update status across distributed saga lifecycle</span>
+      <!-- TAB 1: Order Fulfillment -->
+      <div *ngIf="activeTab === 'orders'" class="admin-panel card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Order Fulfillment & Distributed Saga Lifecycle</h2>
+            <p class="panel-subtitle">Update order states directly; triggers downstream inventory and notification workflows.</p>
+          </div>
+          <span class="panel-tag">Live Order Ledger</span>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table">
+          <table class="luxe-table">
             <thead>
               <tr>
                 <th>Order Number</th>
-                <th>User / Email</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Current Status</th>
-                <th>Action</th>
+                <th>Customer / Email</th>
+                <th>Timestamp</th>
+                <th>Total Value</th>
+                <th>Status</th>
+                <th>Update State</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of orders">
-                <td class="font-bold">
-                  <a [routerLink]="['/orders', order.orderNumber]" class="text-primary">{{ order.orderNumber }}</a>
+              <tr *ngFor="let order of orders" class="table-row">
+                <td>
+                  <a [routerLink]="['/orders', order.orderNumber]" class="order-ref-link">
+                    {{ order.orderNumber }}
+                  </a>
                 </td>
-                <td>{{ order.userEmail || ('User #' + order.userId) }}</td>
-                <td class="text-muted">{{ order.createdAt | date:'short' }}</td>
-                <td class="font-bold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
+                <td>
+                  <div class="user-meta">
+                    <span class="user-email-text">{{ order.userEmail || ('Customer #' + order.userId) }}</span>
+                    <span class="user-id-sub">UID: #{{ order.userId }}</span>
+                  </div>
+                </td>
+                <td class="text-muted text-sm">{{ order.createdAt | date:'mediumDate' }} • {{ order.createdAt | date:'shortTime' }}</td>
+                <td class="order-amount">₹{{ order.totalAmount | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
                     {{ order.status }}
@@ -126,43 +164,60 @@ import { ApiResponse } from '../../core/models/api.model';
                   </select>
                 </td>
               </tr>
+              <tr *ngIf="orders.length === 0">
+                <td colspan="6" class="empty-table-state">
+                  <span>📦</span>
+                  <p>No customer orders placed yet.</p>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Tab 2: Product Management -->
-      <div *ngIf="activeTab === 'products'" class="card p-6">
-        <div class="card-header-line mb-4">
-          <h2>Product Catalog Administration</h2>
-          <button (click)="openProductModal()" class="btn btn-sm btn-primary">+ Add Product</button>
+      <!-- TAB 2: Product Catalog -->
+      <div *ngIf="activeTab === 'products'" class="admin-panel card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Product Catalog Administration</h2>
+            <p class="panel-subtitle">Manage catalog visibility, SKUs, category classifications, and pricing.</p>
+          </div>
+          <button (click)="openProductModal()" class="btn-panel-action">+ Add Product</button>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table">
+          <table class="luxe-table">
             <thead>
               <tr>
                 <th>SKU</th>
-                <th>Product Name</th>
+                <th>Product</th>
                 <th>Category</th>
-                <th>Price</th>
-                <th>Status</th>
+                <th>Price (INR)</th>
+                <th>Catalog State</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let product of products">
-                <td class="font-mono">{{ product.sku }}</td>
-                <td class="font-bold">{{ product.name }}</td>
-                <td>{{ product.categoryName || 'General' }}</td>
-                <td class="font-bold">₹{{ product.price | number:'1.2-2' }}</td>
+              <tr *ngFor="let product of products" class="table-row">
+                <td><span class="sku-chip">{{ product.sku }}</span></td>
+                <td>
+                  <div class="product-cell-name">
+                    <span class="p-name">{{ product.name }}</span>
+                  </div>
+                </td>
+                <td><span class="category-chip">{{ product.categoryName || 'General' }}</span></td>
+                <td class="order-amount">₹{{ product.price | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="product.active ? 'badge-success' : 'badge-danger'">
                     {{ product.active ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
                 <td>
-                  <button (click)="toggleProductActive(product)" class="btn btn-sm btn-outline">
+                  <button
+                    (click)="toggleProductActive(product)"
+                    class="btn-toggle-active"
+                    [class.btn-deactivate]="product.active"
+                  >
                     {{ product.active ? 'Deactivate' : 'Activate' }}
                   </button>
                 </td>
@@ -172,36 +227,39 @@ import { ApiResponse } from '../../core/models/api.model';
         </div>
       </div>
 
-      <!-- Tab 3: Inventory Management -->
-      <div *ngIf="activeTab === 'inventory'" class="card p-6">
-        <div class="card-header-line mb-4">
-          <h2>Inventory Stock Levels & Concurrency Management</h2>
-          <span class="text-muted text-sm">Directly managed with pessimistic row-level write locks</span>
+      <!-- TAB 3: Inventory Management -->
+      <div *ngIf="activeTab === 'inventory'" class="admin-panel card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Inventory Stock & Concurrency Controller</h2>
+            <p class="panel-subtitle">Direct pessimistic row-level locking ensures zero overselling across high-traffic flash sales.</p>
+          </div>
+          <span class="panel-tag">Pessimistic Lock Active</span>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table">
+          <table class="luxe-table">
             <thead>
               <tr>
                 <th>Product SKU</th>
                 <th>Product Name</th>
-                <th>Stock Level</th>
+                <th>Current In-Stock</th>
                 <th>Replenish / Set Stock</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of inventoryItems">
-                <td class="font-mono">{{ item.sku }}</td>
+              <tr *ngFor="let item of inventoryItems" class="table-row">
+                <td><span class="sku-chip">{{ item.sku }}</span></td>
                 <td class="font-bold">{{ item.productName }}</td>
                 <td>
                   <span class="badge" [ngClass]="item.stockQuantity > 20 ? 'badge-success' : (item.stockQuantity > 0 ? 'badge-warning' : 'badge-danger')">
-                    {{ item.stockQuantity }} Available
+                    {{ item.stockQuantity }} units available
                   </span>
                 </td>
                 <td>
-                  <div class="stock-input-group">
-                    <input type="number" [(ngModel)]="item.newStock" min="0" class="stock-input" />
-                    <button (click)="updateStock(item)" class="btn btn-sm btn-primary">Update</button>
+                  <div class="stock-action-cell">
+                    <input type="number" [(ngModel)]="item.newStock" min="0" class="stock-num-input" />
+                    <button (click)="updateStock(item)" class="btn-update-stock">Save</button>
                   </div>
                 </td>
               </tr>
@@ -212,49 +270,52 @@ import { ApiResponse } from '../../core/models/api.model';
 
       <!-- Create Product Modal -->
       <div *ngIf="showProductModal" class="modal-backdrop">
-        <div class="card modal-content p-6">
-          <div class="modal-header mb-4">
-            <h2>Add New Product to Catalog</h2>
-            <button (click)="closeProductModal()" class="btn-close">×</button>
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <span class="badge badge-primary mb-1">Catalog Expansion</span>
+              <h2 class="modal-title">Add New Product to Catalog</h2>
+            </div>
+            <button (click)="closeProductModal()" class="modal-close-btn" aria-label="Close modal">×</button>
           </div>
 
-          <form [formGroup]="productForm" (ngSubmit)="onCreateProduct()">
+          <form [formGroup]="productForm" (ngSubmit)="onCreateProduct()" class="modal-body">
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-label">SKU *</label>
-                <input type="text" formControlName="sku" class="form-control" placeholder="PROD-DEVICE-01" />
+                <label class="modal-label">Product SKU *</label>
+                <input type="text" formControlName="sku" class="modal-input" placeholder="e.g. LUXE-AIR-01" />
               </div>
               <div class="form-group">
-                <label class="form-label">Price (₹) *</label>
-                <input type="number" formControlName="price" class="form-control" placeholder="1499.00" step="0.01" />
+                <label class="modal-label">Selling Price (₹) *</label>
+                <input type="number" formControlName="price" class="modal-input" placeholder="2499.00" step="0.01" />
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Product Name *</label>
-              <input type="text" formControlName="name" class="form-control" placeholder="Acoustic Noise-Cancelling Headphones" />
+              <label class="modal-label">Product Title *</label>
+              <input type="text" formControlName="name" class="modal-input" placeholder="e.g. Bang & Olufsen Beoplay HX Wireless Headphones" />
             </div>
 
             <div class="form-group">
-              <label class="form-label">Category *</label>
-              <select formControlName="categoryId" class="form-control">
+              <label class="modal-label">Category *</label>
+              <select formControlName="categoryId" class="modal-input">
                 <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Description</label>
-              <textarea formControlName="description" class="form-control" rows="3" placeholder="Detailed product specifications..."></textarea>
+              <label class="modal-label">Description</label>
+              <textarea formControlName="description" class="modal-input" rows="3" placeholder="Highlight technical specs, warranty, driver size, battery life..."></textarea>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Image URL</label>
-              <input type="text" formControlName="imageUrl" class="form-control" placeholder="https://images.unsplash.com/..." />
+              <label class="modal-label">High-Resolution Image URL</label>
+              <input type="text" formControlName="imageUrl" class="modal-input" placeholder="https://images.unsplash.com/..." />
             </div>
 
-            <div class="modal-footer mt-6">
-              <button type="button" (click)="closeProductModal()" class="btn btn-outline">Cancel</button>
-              <button type="submit" [disabled]="productForm.invalid" class="btn btn-primary">Save Product</button>
+            <div class="modal-actions">
+              <button type="button" (click)="closeProductModal()" class="btn-modal-cancel">Cancel</button>
+              <button type="submit" [disabled]="productForm.invalid" class="btn-modal-submit">Publish Product</button>
             </div>
           </form>
         </div>
@@ -262,135 +323,559 @@ import { ApiResponse } from '../../core/models/api.model';
     </div>
   `,
   styles: [`
-    .py-8 { padding-top: 2rem; padding-bottom: 3rem; }
-    .admin-header {
+    .py-8 { padding-top: 2rem; padding-bottom: 3.5rem; }
+
+    /* Admin Header Card */
+    .admin-header-card {
+      background: linear-gradient(135deg, #1e2232 0%, #11131a 100%);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
     }
-    .page-title { font-size: 1.85rem; color: var(--secondary); }
+    .admin-header-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 63, 108, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .console-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      background: rgba(255, 63, 108, 0.15);
+      border: 1px solid rgba(255, 63, 108, 0.3);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #ff527b;
+      margin-bottom: 10px;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #ff3f6c;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff3f6c;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .console-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.4px;
+    }
+    .console-subtitle {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    .btn-create-product {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(105deg, #ff3f6c 0%, #ff527b 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 63, 108, 0.4);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-create-product:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 63, 108, 0.5);
+    }
+
+    /* KPI Metrics Cards */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
     }
-    .metric-card { background: #ffffff; }
-    .metric-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .metric-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .metric-icon { font-size: 1.4rem; }
-    .metric-value { font-size: 1.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 4px; }
-    .metric-sub { font-size: 0.75rem; font-weight: 600; }
-    
-    .tab-bar {
+    .kpi-card {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    .revenue-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff3f6c, #f43397);
+    }
+    .orders-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    }
+    .catalog-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+    }
+    .stock-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+    }
+
+    .kpi-top {
       display: flex;
-      gap: 10px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 2px;
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -4px;
-      transition: all 0.15s ease;
+    .kpi-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
     }
-    .tab-btn:hover { color: var(--primary); }
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-    
-    .card-header-line {
+    .kpi-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      font-size: 1.1rem;
     }
-    .card-header-line h2 { font-size: 1.15rem; }
-    .data-table {
+    .bg-pink-light { background: #fff0f3; }
+    .bg-blue-light { background: #eff6ff; }
+    .bg-purple-light { background: #f5f3ff; }
+    .bg-amber-light { background: #fffbeb; }
+
+    .kpi-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .val-alert { color: #dc2626; }
+
+    .kpi-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+    }
+    .kpi-trend {
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+    }
+    .trend-up { background: #ecfdf5; color: #059669; }
+    .trend-neutral { background: #eff6ff; color: #2563eb; }
+    .trend-alert { background: #fef2f2; color: #dc2626; }
+    .kpi-hint { color: var(--text-muted); font-weight: 500; }
+
+    /* Console Tabs */
+    .console-tabs-wrap {
+      display: flex;
+      gap: 12px;
+      background: #ffffff;
+      padding: 6px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      overflow-x: auto;
+    }
+    .console-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .console-tab:hover {
+      background: #f8f9fa;
+      color: var(--secondary);
+    }
+    .console-tab.active {
+      background: #282c3f;
+      color: #ffffff;
+    }
+    .tab-icon { font-size: 1rem; }
+    .tab-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: rgba(255, 63, 108, 0.15);
+      color: #ff3f6c;
+    }
+    .console-tab.active .tab-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    /* Admin Panel Card */
+    .admin-panel {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      padding: 24px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--secondary);
+      margin: 0 0 4px 0;
+    }
+    .panel-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .panel-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: rgba(255, 63, 108, 0.08);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 63, 108, 0.2);
+    }
+    .btn-panel-action {
+      background: #282c3f;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-panel-action:hover { background: #11131a; }
+
+    /* Luxe Data Table */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .luxe-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.875rem;
     }
-    .data-table th {
+    .luxe-table th {
       text-align: left;
-      padding: 10px 12px;
-      border-bottom: 2px solid #f1f5f9;
+      padding: 12px 14px;
+      background: #fbfbfc;
+      border-bottom: 2px solid var(--border-color);
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      font-weight: 800;
       text-transform: uppercase;
+      letter-spacing: 0.6px;
     }
-    .data-table td {
-      padding: 14px 12px;
-      border-bottom: 1px solid #f1f5f9;
+    .luxe-table td {
+      padding: 14px 14px;
+      border-bottom: 1px solid #f1f3f7;
+      vertical-align: middle;
     }
+    .table-row:hover { background: #fafbfc; }
+
+    .order-ref-link {
+      color: var(--primary);
+      font-weight: 800;
+      font-family: monospace;
+      font-size: 0.88rem;
+      text-decoration: none;
+    }
+    .order-ref-link:hover { text-decoration: underline; }
+
+    .user-meta { display: flex; flex-direction: column; gap: 2px; }
+    .user-email-text { font-weight: 600; color: var(--secondary); font-size: 0.85rem; }
+    .user-id-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+    .order-amount {
+      font-weight: 800;
+      color: var(--secondary);
+    }
+
     .status-select {
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-color);
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.78rem;
+      font-weight: 700;
       background: #ffffff;
+      color: var(--secondary);
+      outline: none;
+      cursor: pointer;
     }
-    .stock-input-group { display: flex; align-items: center; gap: 8px; }
-    .stock-input {
-      width: 80px;
-      padding: 4px 8px;
+    .status-select:focus { border-color: var(--primary); }
+
+    .sku-chip {
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .category-chip {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #f8fafc;
+      color: #475569;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+    .product-cell-name .p-name {
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .btn-toggle-active {
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #22c55e;
+      background: #f0fdf4;
+      color: #15803d;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-toggle-active.btn-deactivate {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #dc2626;
+    }
+    .btn-toggle-active:hover { filter: brightness(0.95); }
+
+    .stock-action-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stock-num-input {
+      width: 75px;
+      padding: 6px 8px;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
     }
-    .font-mono { font-family: monospace; font-size: 0.8rem; }
-    
+    .stock-num-input:focus { border-color: var(--primary); }
+    .btn-update-stock {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-update-stock:hover { opacity: 0.9; }
+
+    .empty-table-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-muted);
+    }
+    .empty-table-state span { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+
+    /* Modal Styling */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.65);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
+      padding: 16px;
     }
-    .modal-content {
+    .modal-card {
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
       background: #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .modal-header {
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: flex-start;
+      background: #fbfbfc;
     }
-    .modal-header h2 { font-size: 1.25rem; }
-    .btn-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--secondary);
+      margin: 0;
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+    }
+    .modal-close-btn:hover { color: var(--secondary); }
+
+    .modal-body {
+      padding: 24px;
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .modal-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .modal-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 63, 108, 0.12);
+    }
+    textarea.modal-input { resize: vertical; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+    .btn-modal-cancel {
+      padding: 10px 18px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .btn-modal-cancel:hover { background: #f8fafc; }
+    .btn-modal-submit {
+      padding: 10px 22px;
+      border: none;
+      background: linear-gradient(105deg, #ff3f6c 0%, #ff527b 100%);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 63, 108, 0.35);
+    }
+    .btn-modal-submit:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(255, 63, 108, 0.5);
+    }
+    .btn-modal-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     @media (max-width: 992px) {
-      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-      .admin-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .header-actions { width: 100%; }
-      .header-actions .btn { width: 100%; text-align: center; }
+      .admin-header-card { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
     }
-
     @media (max-width: 600px) {
-      .page-title { font-size: 1.45rem; }
+      .console-title { font-size: 1.4rem; }
       .metrics-grid { grid-template-columns: 1fr; }
-      .card.p-6 { padding: 1.25rem 1rem; }
-      .modal-content {
-        margin: 12px;
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-      .card-header-line { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .card-header-line .btn { width: 100%; text-align: center; }
+      .form-grid-2 { grid-template-columns: 1fr; }
+      .admin-panel { padding: 16px 12px; }
+      .modal-card { max-height: 90vh; overflow-y: auto; }
     }
   `]
 })
